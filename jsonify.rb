@@ -46,4 +46,15 @@ years.each { |y|
 }
 
 #puts data.to_json
-puts JSON.pretty_generate(data)
+#puts JSON.pretty_generate(data)
+
+first = true
+data.each { |y,v|
+    v.each { |c,vv|
+        if first
+            puts (["year", "country"] + vv.collect { |n,vvv| n }).join(",")
+            first = false
+        end
+        puts ([y.to_s, c] + vv.collect { |n,vvv| vvv.to_s }).join(",")
+    }
+}
