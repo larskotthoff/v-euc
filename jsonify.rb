@@ -1,60 +1,76 @@
 #!/usr/bin/env ruby
 
 require 'json'
+require 'date'
 
-years = (2001..2010).to_a
-countries = ["Germany", "Ireland", "Greece", "Spain", "France", "Portugal", "United Kingdom", "Italy"]
-
-a = IO.readlines(ARGV[0])[1..-1]
-dd = IO.readlines(ARGV[1])[1..-1]
-
-data = {}
-
-def cv(v)
-    if v == ":" then
-        return -1
+def cv(s)
+    if s.empty? then
+        "NA"
     else
-        return v.to_f
+        s.to_f
     end
 end
 
-years.each { |y|
-    ay = a.find_all { |ad| ad.split(/,/)[0][1..-2].to_i == y }
-    ddy = dd.find_all { |ddd| ddd.split(/,/)[0][1..-2].to_i == y }
-    h = {}
-    countries.each { |c|
-        ayc = ay.find_all { |ayd| ayd.split(/,/)[1][1..-2] =~ Regexp.new(c) }
-        ddyc = ddy.find_all { |ddyd| ddyd.split(/,/)[1][1..-2] =~ Regexp.new(c) }
+data = {}
 
-        #aycd = cv(ayc.find { |d| d.split(/,/)[4][1..-2] =~ /Net lending/ }.split(/,/)[-2][1..-2])
-        #ddycd = cv(ddyc.find { |d| d.split(/,/)[4][1..-2] =~ /Net lending/ }.split(/,/)[-2][1..-2])
-        #if aycd != ddycd
-        #    puts y.to_s + " " + c + " " + aycd.to_s + " " + ddycd.to_s
-        #end
-
-        hh = {}
-        hh["interest"] = cv(ayc.find { |d| d.split(/\",\"/)[4] =~ /Interest/ }.split(/\",\"/)[-2])
-        hh["deficit"] = cv(ayc.find { |d| d.split(/,/)[4][1..-2] =~ /Net lending/ }.split(/,/)[-2][1..-2])
-        hh["debt"] = cv(ddyc.find { |d| d.split(/,/)[4][1..-2] =~ /^Government consolidated gross debt$/ }.split(/,/)[-2][1..-2])
-        hh["shorts"] = cv(ddyc.find { |d| d.split(/,/)[4][1..-2] =~ /Short term securities/ }.split(/,/)[-2][1..-2])
-        hh["longs"] = cv(ddyc.find { |d| d.split(/,/)[4][1..-2] =~ /Long-term securities/ }.split(/,/)[-2][1..-2])
-        hh["shortl"] = cv(ddyc.find { |d| d.split(/,/)[4][1..-2] =~ /Short-term loans/ }.split(/,/)[-2][1..-2])
-        hh["longl"] = cv(ddyc.find { |d| d.split(/,/)[4][1..-2] =~ / Long-term loans/ }.split(/,/)[-2][1..-2])
-        h[c] = hh
+defcsv = IO.readlines(ARGV[0])[5..-1]
+deforder = ["Germany", "Spain", "France", "United Kingdom", "Greece", "Ireland", "Italy", "Portugal"]
+defdates = ["01/04/2011", "01/01/2011",
+            "01/10/2010", "01/07/2010", "01/04/2010", "01/01/2010",
+            "01/10/2009", "01/07/2009", "01/04/2009", "01/01/2009",
+            "01/10/2008", "01/07/2008", "01/04/2008", "01/01/2008",
+            "01/10/2007", "01/07/2007", "01/04/2007", "01/01/2007"]
+deficit = {}
+deforder.each_with_index { |c,i|
+    chash = {}
+    defdates.each_with_index { |d,j|
+        chash[d] = cv(defcsv[j].split(/,/)[i+1].gsub(/\"/, ""))
     }
-    data[y] = h
+    deficit[c] = chash
 }
+data["deficit"] = deficit
 
-#puts data.to_json
+ratcsv = IO.readlines(ARGV[1])[4..-1]
+ratings = {}
+deforder.each { |c|
+    chash = {}
+    cdata = ratcsv.find_all { |d| d.split(/,/)[0].gsub(/\"/, "") == c }.sort { |a,b|
+            Date.strptime(a.split(/,/)[1], "%d %b %Y") <=>
+            Date.strptime(b.split(/,/)[1], "%d %b %Y")
+        }
+    item = cdata.find { |d| d.split(/,/)[1].split(/ /)[2].to_i >= 2007 }
+    idx = if item.nil? then
+                cdata.length
+            else
+                cdata.index(item)
+            end
+    cdata[(idx-1)..-1].each { |l|
+        date = Date.strptime(l.split(/,/)[1], "%d %b %Y")
+        chash[date.strftime("%d/%m/%Y")] = l.split(/,/)[2].gsub(/\"/, "")
+    }
+    ratings[c] = chash
+}
+data["ratings"] = ratings
+
+interestorder = ["Germany", "Spain", "France", "Greece", "Ireland", "Italy", "Portugal"]
+interest = {}
+interestcsv = IO.readlines(ARGV[2])[5..-1]
+interestorder.each_with_index { |c,i|
+    chash = {}
+    interestcsv[0..57].each { |l|
+        date = Date.strptime(l.split(/,/)[0].gsub(/\"/, ""), "%Y%b")
+        chash[date.strftime("%d/%m/%Y")] = cv(l.split(/,/)[i+1].gsub(/\"/, ""))
+    }
+    interest[c] = chash
+}
+interestcsv = IO.readlines(ARGV[3])[5..-1]
+chash = {}
+interestcsv[0..57].each { |l|
+    date = Date.strptime(l.split(/,/)[0].gsub(/\"/, ""), "%Y%b")
+    chash[date.strftime("%d/%m/%Y")] = cv(l.split(/,/)[1].gsub(/\"/, ""))
+}
+interest["United Kingdom"] = chash
+data["interest"] = interest
+
+puts data.to_json
 #puts JSON.pretty_generate(data)
-
-first = true
-data.each { |y,v|
-    v.each { |c,vv|
-        if first
-            puts (["year", "country"] + vv.collect { |n,vvv| n }).join(",")
-            first = false
-        end
-        puts ([y.to_s, c] + vv.collect { |n,vvv| vvv.to_s }).join(",")
-    }
-}
