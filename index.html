@@ -18,8 +18,7 @@ h1 {
     margin: 0 0 0;
 }
 path {
-    stroke: #bf8330;
-    stroke-width: 2;
+    stroke-width: 3;
     fill: none;
     stroke-linecap: round;
 }
@@ -28,6 +27,7 @@ path {
   stroke-width: 1;
 }
 .domain {
+  stroke-width: 2;
   fill: none;
   stroke: #000;
 }
@@ -43,8 +43,9 @@ path {
         </div>
         <div id="graph" style="position: fixed; top: 15%;"></div>
         <div style="position: fixed; bottom: 10px; left: 10px">
-            Data courtesy of the
-            <a href="http://www.ecb.int/">European Central Bank</a>.
+            Deficit and interest rates courtesy of the
+            <a href="http://www.ecb.int/">European Central Bank</a>,
+            ratings are those of <a href="http://www.fitchratings.com">Fitch</a>.
         </div>
         <div style="position: fixed; bottom: 10px; right: 10px">
             Lars Kotthoff 2011
@@ -77,6 +78,13 @@ path {
                         return dformat.parse(e[0]);
                     }));
                 })),
+                rscale = d3.scale.ordinal()
+                    .domain(["AAA", "AAA-", "AA+", "AA", "AA-", "A+", "A", "A-",
+                             "BBB+", "BBB", "BBB-", "BB+", "BB", "BB-", "B+",
+                             "B", "B-", "CCC+", "CCC"])
+                    .rangePoints([0, 1]),
+                crscale = d3.scale.linear().domain([0, 0.5, 1])
+                    .range(["green", "yellow", "red"]),
                 x = d3.time.scale().domain([tmin, tmax])
                     .range([margin, width - 30]),
                 y = d3.scale.linear().domain([dmin, dmax]).nice()
@@ -87,10 +95,39 @@ path {
                             .y(function(d) { return y(d[1]); })
                             .x(function(d) { return x(dformat.parse(d[0])); });
 
+            function grad(d) {
+                var xp = d3.time.scale().domain([tmin, tmax]);
+                d3.select(this).append("svg:stop")
+                    .attr("offset", 0)
+                    .attr("stop-color", crscale(rscale(d.value[0][1])));
+                for(var i = 1; i < d.value.length &&
+                        dformat.parse(d.value[i][0]) <= tmax; i++) {
+                    d3.select(this).append("svg:stop")
+                        .attr("offset", xp(dformat.parse(d.value[i][0])))
+                        .attr("stop-color", crscale(rscale(d.value[i-1][1])));
+                    d3.select(this).append("svg:stop")
+                        .attr("offset", xp(dformat.parse(d.value[i][0])))
+                        .attr("stop-color", crscale(rscale(d.value[i][1])));
+                }
+                d3.select(this).append("svg:stop")
+                    .attr("offset", 1)
+                    .attr("stop-color",
+                        crscale(rscale(d.value[d.value.length-1][1])));
+            }
+
+            svg.append("svg:defs")
+                .selectAll("linearGradient")
+                .data(d3.entries(json.ratings)).enter()
+                .append("svg:linearGradient")
+                .attr("id", function(d) { return d.key.substr(0, 3); })
+                .each(grad);
+
             svg.selectAll("path")
-                .data(d3.values(json.deficit)).enter().append("svg:path")
-                .attr("class", "line")
-                .attr("d", line);
+                .data(d3.entries(json.deficit)).enter().append("svg:path")
+                .attr("stroke", function(d) {
+                    return "url(#" + d.key.substr(0, 3) + ")";
+                })
+                .attr("d", function(d) { return line(d.value); });
 
             svg.append("svg:g")
                 .attr("transform", "translate(0," + (height - margin + 5) + ")")
