@@ -141,6 +141,7 @@ path {
 
             function area(d) {
                 return d3.svg.area()
+                    .interpolate("monotone")
                     .x(function(e) { return x(dformat.parse(e[0])); })
                     .y0(function(e) {
                         return y(e[1]) + iscales[d.key](dformat.parse(e[0]))/2;
