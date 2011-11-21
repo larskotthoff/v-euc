@@ -5,17 +5,21 @@ require 'date'
 
 def cv(s)
     if s.empty? then
-        "NA"
+        nil
     else
         s.to_f
     end
+end
+
+def dsort(a, b)
+    Date.strptime(a[0], "%d/%m/%Y") <=> Date.strptime(b[0], "%d/%m/%Y")
 end
 
 data = {}
 
 defcsv = IO.readlines(ARGV[0])[5..-1]
 deforder = ["Germany", "Spain", "France", "United Kingdom", "Greece", "Ireland", "Italy", "Portugal"]
-defdates = ["01/04/2011", "01/01/2011",
+defdates = ["01/07/2011", "01/04/2011", "01/01/2011",
             "01/10/2010", "01/07/2010", "01/04/2010", "01/01/2010",
             "01/10/2009", "01/07/2009", "01/04/2009", "01/01/2009",
             "01/10/2008", "01/07/2008", "01/04/2008", "01/01/2008",
@@ -24,9 +28,10 @@ deficit = {}
 deforder.each_with_index { |c,i|
     chash = {}
     defdates.each_with_index { |d,j|
-        chash[d] = cv(defcsv[j].split(/,/)[i+1].gsub(/\"/, ""))
+        tmp = cv(defcsv[j].split(/,/)[i+1].gsub(/\"/, ""))
+        chash[d] = tmp if tmp
     }
-    deficit[c] = chash
+    deficit[c] = chash.sort { |a,b| dsort(a,b) }
 }
 data["deficit"] = deficit
 
@@ -48,7 +53,7 @@ deforder.each { |c|
         date = Date.strptime(l.split(/,/)[1], "%d %b %Y")
         chash[date.strftime("%d/%m/%Y")] = l.split(/,/)[2].gsub(/\"/, "")
     }
-    ratings[c] = chash
+    ratings[c] = chash.sort { |a,b| dsort(a,b) }
 }
 data["ratings"] = ratings
 
@@ -59,17 +64,19 @@ interestorder.each_with_index { |c,i|
     chash = {}
     interestcsv[0..57].each { |l|
         date = Date.strptime(l.split(/,/)[0].gsub(/\"/, ""), "%Y%b")
-        chash[date.strftime("%d/%m/%Y")] = cv(l.split(/,/)[i+1].gsub(/\"/, ""))
+        tmp = cv(l.split(/,/)[i+1].gsub(/\"/, ""))
+        chash[date.strftime("%d/%m/%Y")] = tmp if tmp
     }
-    interest[c] = chash
+    interest[c] = chash.sort { |a,b| dsort(a,b) }
 }
 interestcsv = IO.readlines(ARGV[3])[5..-1]
 chash = {}
 interestcsv[0..57].each { |l|
     date = Date.strptime(l.split(/,/)[0].gsub(/\"/, ""), "%Y%b")
-    chash[date.strftime("%d/%m/%Y")] = cv(l.split(/,/)[1].gsub(/\"/, ""))
+    tmp = cv(l.split(/,/)[1].gsub(/\"/, ""))
+    chash[date.strftime("%d/%m/%Y")] = tmp if tmp
 }
-interest["United Kingdom"] = chash
+interest["United Kingdom"] = chash.sort { |a,b| dsort(a,b) }
 data["interest"] = interest
 
 puts data.to_json

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Euro crisis</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <script type="text/javascript" src="../d3.min.js"></script>
+        <script type="text/javascript" src="../d3.layout.min.js"></script>
+        <script type="text/javascript" src="../d3.time.min.js"></script>
+        <script type="text/javascript" src="../jquery-1.6.2.min.js"></script>
+        <style type="text/css"> 
+body {
+    font: 12px Verdana, Palatino, Helvetica, sans;
+    background: #ffdd73;
+}
+h1 {
+    font-weight: normal;
+    font-size: 4em;
+    margin: 0 0 0;
+}
+path {
+    stroke: #bf8330;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+}
+.tick {
+  stroke: #000;
+  stroke-width: 1;
+}
+.domain {
+  fill: none;
+  stroke: #000;
+}
+.title {
+    font-weight: bold;
+}
+        </style>
+    </head>
+
+    <body>
+        <div style="position: fixed; top: 10px; left: 10px">
+            <h1>Euro crisis</h1>
+        </div>
+        <div id="graph" style="position: fixed; top: 15%;"></div>
+        <div style="position: fixed; bottom: 10px; left: 10px">
+            Data courtesy of the
+            <a href="http://www.ecb.int/">European Central Bank</a>.
+        </div>
+        <div style="position: fixed; bottom: 10px; right: 10px">
+            Lars Kotthoff 2011
+        </div>
+        <script type="text/javascript">
+        (function () {
+        var margin = 50,
+            width = window.innerWidth - 30,
+            height = window.innerHeight*0.8,
+            svg = d3.select("#graph")
+                .append("svg:svg")
+                .attr("height", height)
+                .attr("width", width);
+
+        d3.json("debt.json", function(json) {
+            var dmax = d3.max($.map(d3.values(json.deficit), function(d) {
+                    return d3.max($.map(d, function(e) { return e[1]; }));
+                })),
+                dmin = d3.min($.map(d3.values(json.deficit), function(d) {
+                    return d3.min($.map(d, function(e) { return e[1]; }));
+                })),
+                dformat = d3.time.format("%d/%m/%Y")
+                tmin = d3.min($.map(d3.values(json.deficit), function(d) {
+                    return d3.min($.map(d, function(e) {
+                        return dformat.parse(e[0]);
+                    }));
+                })),
+                tmax = d3.max($.map(d3.values(json.deficit), function(d) {
+                    return d3.max($.map(d, function(e) {
+                        return dformat.parse(e[0]);
+                    }));
+                })),
+                x = d3.time.scale().domain([tmin, tmax])
+                    .range([margin, width - 30]),
+                y = d3.scale.linear().domain([dmin, dmax]).nice()
+                    .range([height - margin, 15]),
+                xlabels = d3.svg.axis().scale(x).orient("bottom"),
+                ylabels = d3.svg.axis().scale(y).orient("left").ticks(20),
+                line = d3.svg.line()
+                            .y(function(d) { return y(d[1]); })
+                            .x(function(d) { return x(dformat.parse(d[0])); });
+
+            svg.selectAll("path")
+                .data(d3.values(json.deficit)).enter().append("svg:path")
+                .attr("class", "line")
+                .attr("d", line);
+
+            svg.append("svg:g")
+                .attr("transform", "translate(0," + (height - margin + 5) + ")")
+                .call(xlabels);
+            svg.append("svg:g")
+                .classed("yaxis", true)
+                .attr("transform", "translate(" + (margin - 5) + ",0)")
+                .call(ylabels);
+            svg.append("svg:text")
+                .classed("title", true)
+                .attr("transform", "translate(" + (margin + 5) + ",15)")
+                .attr("text-anchor", "start")
+                .text("deficit [% GDP]");
+        });
+        })();
+        </script>
+    </body>
+</html>
