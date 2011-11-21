@@ -23,7 +23,8 @@ defdates = ["01/07/2011", "01/04/2011", "01/01/2011",
             "01/10/2010", "01/07/2010", "01/04/2010", "01/01/2010",
             "01/10/2009", "01/07/2009", "01/04/2009", "01/01/2009",
             "01/10/2008", "01/07/2008", "01/04/2008", "01/01/2008",
-            "01/10/2007", "01/07/2007", "01/04/2007", "01/01/2007"]
+            "01/10/2007", "01/07/2007", "01/04/2007", "01/01/2007",
+            "01/10/2006", "01/07/2006", "01/04/2006", "01/01/2006"]
 deficit = {}
 deforder.each_with_index { |c,i|
     chash = {}
@@ -43,7 +44,7 @@ deforder.each { |c|
             Date.strptime(a.split(/,/)[1], "%d %b %Y") <=>
             Date.strptime(b.split(/,/)[1], "%d %b %Y")
         }
-    item = cdata.find { |d| d.split(/,/)[1].split(/ /)[2].to_i >= 2007 }
+    item = cdata.find { |d| d.split(/,/)[1].split(/ /)[2].to_i >= 2006 }
     idx = if item.nil? then
                 cdata.length
             else
@@ -62,7 +63,7 @@ interest = {}
 interestcsv = IO.readlines(ARGV[2])[5..-1]
 interestorder.each_with_index { |c,i|
     chash = {}
-    interestcsv[0..57].each { |l|
+    interestcsv[0..69].each { |l|
         date = Date.strptime(l.split(/,/)[0].gsub(/\"/, ""), "%Y%b")
         tmp = cv(l.split(/,/)[i+1].gsub(/\"/, ""))
         chash[date.strftime("%d/%m/%Y")] = tmp if tmp
@@ -71,7 +72,7 @@ interestorder.each_with_index { |c,i|
 }
 interestcsv = IO.readlines(ARGV[3])[5..-1]
 chash = {}
-interestcsv[0..57].each { |l|
+interestcsv[0..69].each { |l|
     date = Date.strptime(l.split(/,/)[0].gsub(/\"/, ""), "%Y%b")
     tmp = cv(l.split(/,/)[1].gsub(/\"/, ""))
     chash[date.strftime("%d/%m/%Y")] = tmp if tmp
