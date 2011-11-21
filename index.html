@@ -18,18 +18,20 @@ h1 {
     margin: 0 0 0;
 }
 path {
-    stroke-width: 3;
-    fill: none;
+    stroke: #bf8330;
+    stroke-width: 1;
     stroke-linecap: round;
 }
 .tick {
   stroke: #000;
   stroke-width: 1;
+  fill: none;
 }
 .domain {
   stroke-width: 2;
   fill: none;
   stroke: #000;
+  fill: none;
 }
 .title {
     font-weight: bold;
@@ -67,6 +69,13 @@ path {
                 dmin = d3.min($.map(d3.values(json.deficit), function(d) {
                     return d3.min($.map(d, function(e) { return e[1]; }));
                 })),
+                imax = d3.max($.map(d3.values(json.interest), function(d) {
+                    return d3.max($.map(d, function(e) { return e[1]; }));
+                })),
+                imin = d3.min($.map(d3.values(json.interest), function(d) {
+                    return d3.min($.map(d, function(e) { return e[1]; }));
+                })),
+                iscale = d3.scale.linear().domain([imin, imax]).range([2, 16]),
                 dformat = d3.time.format("%d/%m/%Y")
                 tmin = d3.min($.map(d3.values(json.deficit), function(d) {
                     return d3.min($.map(d, function(e) {
@@ -90,10 +99,7 @@ path {
                 y = d3.scale.linear().domain([dmin, dmax]).nice()
                     .range([height - margin, 15]),
                 xlabels = d3.svg.axis().scale(x).orient("bottom"),
-                ylabels = d3.svg.axis().scale(y).orient("left").ticks(20),
-                line = d3.svg.line()
-                            .y(function(d) { return y(d[1]); })
-                            .x(function(d) { return x(dformat.parse(d[0])); });
+                ylabels = d3.svg.axis().scale(y).orient("left").ticks(20);
 
             function grad(d) {
                 var xp = d3.time.scale().domain([tmin, tmax]);
@@ -115,6 +121,17 @@ path {
                         crscale(rscale(d.value[d.value.length-1][1])));
             }
 
+            var iscales = [];
+            $.each(d3.entries(json.interest), function(i, d) {
+                iscales[d.key] = d3.scale.linear()
+                    .domain($.map(d.value, function(e) {
+                        return dformat.parse(e[0]);
+                    }))
+                    .range($.map(d.value, function(e) {
+                        return iscale(e[1]);
+                    }));
+            });
+
             svg.append("svg:defs")
                 .selectAll("linearGradient")
                 .data(d3.entries(json.ratings)).enter()
@@ -122,12 +139,22 @@ path {
                 .attr("id", function(d) { return d.key.substr(0, 3); })
                 .each(grad);
 
+            function area(d) {
+                return d3.svg.area()
+                    .x(function(e) { return x(dformat.parse(e[0])); })
+                    .y0(function(e) {
+                        return y(e[1]) + iscales[d.key](dformat.parse(e[0]))/2;
+                    })
+                    .y1(function(e) {
+                        return y(e[1]) - iscales[d.key](dformat.parse(e[0]))/2;
+                    })(d.value);
+            };
             svg.selectAll("path")
                 .data(d3.entries(json.deficit)).enter().append("svg:path")
-                .attr("stroke", function(d) {
+                .attr("fill", function(d) {
                     return "url(#" + d.key.substr(0, 3) + ")";
                 })
-                .attr("d", function(d) { return line(d.value); });
+                .attr("d", area);
 
             svg.append("svg:g")
                 .attr("transform", "translate(0," + (height - margin + 5) + ")")
