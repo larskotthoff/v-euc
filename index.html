@@ -17,6 +17,11 @@ h1 {
     font-size: 4em;
     margin: 0 0 0;
 }
+line {
+    stroke: #bf8330;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
 path {
     stroke: #bf8330;
     stroke-width: 1;
@@ -131,6 +136,18 @@ path {
                         return iscale(e[1]);
                     }));
             });
+
+            svg.append("svg:line")
+                .attr("y1", y(0))
+                .attr("y2", y(0))
+                .attr("x1", x(tmin))
+                .attr("x2", x(tmax));
+            svg.append("svg:line")
+                .attr("stroke-dasharray", "10 10")
+                .attr("y1", y(-3))
+                .attr("y2", y(-3))
+                .attr("x1", x(tmin))
+                .attr("x2", x(tmax));
 
             svg.append("svg:defs")
                 .selectAll("linearGradient")
