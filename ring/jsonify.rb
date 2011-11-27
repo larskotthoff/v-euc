@@ -100,15 +100,15 @@ deficitcsv = IO.readlines("deficit.csv")[5..-1]
 
 deforder = [0, 1, 4, 11, 2, 3, 5, 6, 7, 8, 9, 10]
 deficitcsv.each { |l|
-    d = l.split(/,/)[0]
-    m = ((3 * d[-1..-1].to_i) + 1) % 12
-    y = d[0..3].to_i + (m == 1 ? 1 : 0)
+    d = l.split(/\t/)[0]
+    m = ((3 * d[-2..-2].to_i) + 1) % 12
+    y = d[1..4].to_i + (m == 1 ? 1 : 0)
     datestr = m.to_s + "/" + y.to_s
     date = Date.strptime(datestr, "%m/%Y")
     if date >= firstdate
         deficit[date] = {} unless deficit.has_key?(date)
         deforder.each_with_index { |i,j|
-            deficit[date][EU12[i]] = cv(l.split(/,/)[j+1])
+            deficit[date][EU12[i]] = cv(l.split(/\t/)[j+1])
         }
     end
 }
@@ -268,13 +268,13 @@ interest.keys.sort.each { |k|
     tmp["debt"]["max"] = vs.max
     tmp["debt"]["median"] = med(vs)
 
-    #ihash = interpolate(k, deficit)
-    #next if ihash.nil? or ihash.values.any? { |x| x.nil? }
-    #vs = ihash.values.sort
-    #tmp["deficit"] = ihash
-    #tmp["deficit"]["min"] = vs.min
-    #tmp["deficit"]["max"] = vs.max
-    #tmp["deficit"]["median"] = med(vs)
+    ihash = interpolate(k, deficit)
+    next if ihash.nil? or ihash.values.any? { |x| x.nil? }
+    vs = ihash.values.sort
+    tmp["deficit"] = ihash
+    tmp["deficit"]["min"] = vs.min
+    tmp["deficit"]["max"] = vs.max
+    tmp["deficit"]["median"] = med(vs)
 
     ihash = interpolate(k, gdpgrowth)
     next if ihash.nil? or ihash.values.any? { |x| x.nil? }
