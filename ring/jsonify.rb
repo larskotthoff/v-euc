@@ -206,19 +206,19 @@ investmenth.each { |d,lines|
     }
 }
 
-pdebt = {}
+edebt = {}
 
-pdebtcsv = IO.readlines("external-debt.csv")[1..-1]
+edebtcsv = IO.readlines("external-debt.csv")[1..-1]
 pddates = ["2006Q1", "2006Q2", "2006Q3", "2006Q4", "2007Q1", "2007Q2", "2007Q3", "2007Q4", "2008Q1", "2008Q2", "2008Q3", "2008Q4", "2009Q1", "2009Q2", "2009Q3", "2009Q4", "2010Q1", "2010Q2", "2010Q3", "2010Q4", "2011Q1", "2011Q2", "2011Q3", "2011Q4"]
-pdebtcsv.each { |l|
+edebtcsv.each { |l|
     country = EU12.find { |c| l.split(/,/)[0] =~ Regexp.new(c) }
     pddates.each_with_index { |d,i|
         m = ((3 * d[-1..-1].to_i) + 1) % 12
         y = d[0..3].to_i + (m == 1 ? 1 : 0)
         datestr = m.to_s + "/" + y.to_s
         date = Date.strptime(datestr, "%m/%Y")
-        pdebt[date] = {} unless pdebt.has_key?(date)
-        pdebt[date][country] = cv(l.split(/,/)[i+4])
+        edebt[date] = {} unless edebt.has_key?(date)
+        edebt[date][country] = cv(l.split(/,/)[i+4])
     }
 }
 
@@ -236,10 +236,10 @@ gdpdollarcsv.each { |l|
         }
     end
 }
-pdebt.each { |d,cs|
+edebt.each { |d,cs|
     cs.each { |c,v|
         gdpdollardate = Date.strptime(d.year.to_s, "%Y")
-        pdebt[d][c] = if v.nil? or gdpdollar[gdpdollardate][c].nil?
+        edebt[d][c] = if v.nil? or gdpdollar[gdpdollardate][c].nil?
                           nil
                       else
                           (v / gdpdollar[gdpdollardate][c]) * 100
@@ -254,7 +254,7 @@ pdebt.each { |d,cs|
 #data["interest"] = interest
 #data["unemployment"] = unemployment
 #data["investment"] = investment
-#data["privatedebt"] = pdebt
+#data["externaldebt"] = edebt
 
 # normalise and predict
 
@@ -313,13 +313,13 @@ interest.keys.sort.each { |k|
     #tmp["investment"]["max"] = vs.max
     #tmp["investment"]["median"] = med(vs)
 
-    ihash = interpolate(k, pdebt)
+    ihash = interpolate(k, edebt)
     next if ihash.nil? or ihash.values.any? { |x| x.nil? }
     vs = ihash.values.sort
-    tmp["privatedebt"] = ihash
-    tmp["privatedebt"]["min"] = vs.min
-    tmp["privatedebt"]["max"] = vs.max
-    tmp["privatedebt"]["median"] = med(vs)
+    tmp["externaldebt"] = ihash
+    tmp["externaldebt"]["min"] = vs.min
+    tmp["externaldebt"]["max"] = vs.max
+    tmp["externaldebt"]["median"] = med(vs)
 
     data[k] = tmp
 }
