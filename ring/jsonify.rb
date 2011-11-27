@@ -45,7 +45,7 @@ def interpolate(date, hash)
             if vbefore.nil? or vafter.nil?
                 return nil
             end
-            h[c] = (vbefore + vafter)/div
+            h[c] = vbefore + ((vafter - vbefore)/div)
         }
         return h
     end
