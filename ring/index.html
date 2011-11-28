@@ -133,7 +133,14 @@ path.med {
                     });
             }
 
-            function update(dat) {
+            function update(idx) {
+                setTimeout(function() {
+                    d3.select("#timelabel").html(fd(json[idx][0]));
+                }, aduration);
+                var dat = d3.entries(json[idx][1]).sort(function(a, b) {
+                    return measures.indexOf(a.key) -
+                            measures.indexOf(b.key);
+                });
                 $.each(["max", "min", "med"], function(j, m) {
                     ctr.selectAll("path." + m)
                         .data([dat.concat(dat[0])])
@@ -235,12 +242,7 @@ path.med {
 
             (function next(idx) {
                 if(idx < json.length) {
-                    d3.select("#timelabel").html(fd(json[idx][0]));
-                    dat = d3.entries(json[idx][1]).sort(function(a, b) {
-                        return measures.indexOf(a.key) -
-                                measures.indexOf(b.key);
-                    });
-                    update(dat);
+                    update(idx);
                     setTimeout(function() { next(idx + 1); }, aduration);
                 }
             })(1);
