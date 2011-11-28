@@ -300,7 +300,9 @@ interest.keys.sort.each { |k|
 
     ihash = interpolate(k, edebt)
     next if ihash.nil? or ihash.values.any? { |x| x.nil? }
-    vs = ihash.values.sort
+    ihashtmp = ihash.dup
+    ihashtmp.delete("L")
+    vs = ihashtmp.values.sort
     tmp["edebt"] = ihash
     tmp["edebt"]["min"] = vs.min
     tmp["edebt"]["max"] = vs.max

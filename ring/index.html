@@ -16,6 +16,12 @@ h1 {
     font-size: 4em;
     margin: 0 0 0;
 }
+.timelabel {
+    font-weight: normal;
+    font-size: 4em;
+    margin: 0 0 0;
+    color: #444;
+}
 path.max {
     fill: #88f;
     stroke: none;
@@ -51,6 +57,8 @@ path.med {
         <div style="position: fixed; top: 10px; left: 10px; right: 70%;">
             <h1>Euro crisis</h1>
         </div>
+        <div id="timelabel" class="timelabel" style="position: fixed; left: 10px; bottom: 10%;">
+        </div>
         <div id="graph" style="position: fixed; left: 30%;"></div>
         <div style="position: fixed; bottom: 10px; left: 10px;">
             Data from ECB, EuroStat, IMF, OECD, World Bank
@@ -61,6 +69,9 @@ path.med {
         <script type="text/javascript">
         (function () {
         var margin = 30,
+            aduration = 750,
+            idformat = d3.time.format("%Y/%m"),
+            odformat = d3.time.format("%B %Y"),
             countries = ["Austria", "Belgium", "Finland", "France", "Germany",
                 "Greece", "Ireland", "Italy", "Luxembourg", "Netherlands",
                 "Portugal", "Spain"],
@@ -85,6 +96,10 @@ path.med {
             } else {
                 return f.toFixed(1);
             }
+        }
+
+        function fd(ds) {
+            return odformat(idformat.parse(ds));
         }
 
         d3.json("eu.json", function(json) {
@@ -118,7 +133,31 @@ path.med {
                     });
             }
 
-            var dat = d3.entries(json[json.length-1][1]).sort(function(a, b) {
+            function update(dat) {
+                $.each(["max", "min", "med"], function(j, m) {
+                    ctr.selectAll("path." + m)
+                        .data([dat.concat(dat[0])])
+                        .transition().duration(aduration)
+                        .attr("d", line(function(d) { return d[m]; }));
+                });
+                $.each(["max", "min"], function(j, m) {
+                    ctr.selectAll("text." + m)
+                        .data(dat)
+                        .transition().duration(aduration)
+                        .attr("transform", function(d, i) {
+                            var a = i * (2 * Math.PI / measures.length),
+                                l = scales[i](d.value[m]) +
+                                    (j == 0 ? margin : -margin) / 2,
+                                x = Math.sin(a) * l,
+                                y = Math.cos(a) * l;
+                            return "translate(" + x + "," + y + ")";
+                        })
+                        .text(function(d) { return vf(d.value[m]); });
+                });
+            }
+
+            d3.select("#timelabel").html(fd(json[0][0]));
+            var dat = d3.entries(json[0][1]).sort(function(a, b) {
                 return measures.indexOf(a.key) - measures.indexOf(b.key);
             });
             $.each(["max", "min", "med"], function(j, m) {
@@ -193,6 +232,18 @@ path.med {
                     }
                 })
                 .text(function(d) { return d; });
+
+            (function next(idx) {
+                if(idx < json.length) {
+                    d3.select("#timelabel").html(fd(json[idx][0]));
+                    dat = d3.entries(json[idx][1]).sort(function(a, b) {
+                        return measures.indexOf(a.key) -
+                                measures.indexOf(b.key);
+                    });
+                    update(dat);
+                    setTimeout(function() { next(idx + 1); }, aduration);
+                }
+            })(1);
         });
         })();
         </script>
