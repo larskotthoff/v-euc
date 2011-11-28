@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Euro crisis</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <script type="text/javascript" src="../../d3.min.js"></script>
+        <script type="text/javascript" src="../../d3.layout.min.js"></script>
+        <script type="text/javascript" src="../../d3.time.min.js"></script>
+        <script type="text/javascript" src="../../jquery-1.6.2.min.js"></script>
+        <style type="text/css"> 
+body {
+    font: 12px Verdana, Palatino, Helvetica, sans;
+    background: #ffdd73;
+}
+h1 {
+    font-weight: normal;
+    font-size: 4em;
+    margin: 0 0 0;
+}
+line {
+    stroke: #bf8330;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+path {
+    stroke: #bf8330;
+    stroke-width: 1;
+    stroke-linecap: round;
+}
+.tick {
+  stroke: #000;
+  stroke-width: 1;
+  fill: none;
+}
+.domain {
+  stroke-width: 2;
+  fill: none;
+  stroke: #000;
+  fill: none;
+}
+.title {
+    font-weight: bold;
+}
+        </style>
+    </head>
+
+    <body>
+        <div style="position: fixed; top: 10px; left: 10px">
+            <h1>Euro crisis</h1>
+        </div>
+        <div id="graph" style="position: fixed; top: 15%;"></div>
+        <div style="position: fixed; bottom: 10px; left: 10px">
+            Data from ECB, EuroStat, IMF, OECD, World Bank
+        </div>
+        <div style="position: fixed; bottom: 10px; right: 10px">
+            Lars Kotthoff 2011
+        </div>
+        <script type="text/javascript">
+        (function () {
+        var margin = 50,
+            countries = ["Austria", "Belgium", "Finland", "France", "Germany",
+                "Greece", "Ireland", "Italy", "Luxembourg", "Netherlands",
+                "Portugal", "Spain"],
+            width = window.innerWidth - 30,
+            height = window.innerHeight*0.8,
+            svg = d3.select("#graph")
+                .append("svg:svg")
+                .attr("height", height)
+                .attr("width", width);
+
+        d3.json("eu.json", function(json) {
+            var measures = d3.keys(json[0][1]),
+                minses = $.map(measures, function(m) {
+                    return d3.min($.map(json, function(d) {
+                        return d[1][m].min;
+                    }));
+                }),
+                maxes = $.map(measures, function(m) {
+                    return d3.max($.map(json, function(d) {
+                        return d[1][m].max;
+                    }));
+                });
+            console.log(measures);
+            console.log(minses);
+            console.log(maxes);
+
+        });
+        })();
+        </script>
+    </body>
+</html>
