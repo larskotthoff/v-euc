@@ -4,6 +4,7 @@ require 'json'
 require 'date'
 
 EU12 = ["Austria", "Belgium", "Finland", "France", "Germany", "Greece", "Ireland", "Italy", "Luxembourg", "Netherlands", "Portugal", "Spain"]
+repl = {"Austria" => "A", "Belgium" => "B", "Finland" => "Fi", "France" => "Fr", "Germany" => "Ge", "Greece" => "Gr", "Ireland" => "Ir", "Italy" => "It", "Luxembourg" => "L", "Netherlands" => "N", "Portugal" => "P" , "Spain" => "S"}
 
 firstdate = Date.strptime("01/04/2006", "%d/%m/%Y")
 
@@ -18,36 +19,20 @@ end
 def interpolate(date, hash)
     ks = hash.keys.sort
     diffs = ks.collect { |d| date - d }
-    idxs = []
+    idx = nil
     diffs.each_with_index { |d,i|
         if d == 0
-            idxs = [i]
+            idx = i
             break
         elsif d < 0
-            idxs = [i-1, i]
+            idx = i-1
             break
         end
     }
-    if idxs.length == 0
+    if idx.nil?
         return nil
-    elsif idxs.length == 1
-        return hash[ks[idxs[0]]]
     else
-        h = {}
-        EU12.each { |c|
-            vbefore = hash[ks[idxs[0]]][c]
-            vafter = hash[ks[idxs[1]]][c]
-            div = if diffs[idxs[0]].abs > diffs[idxs[1]].abs
-                      1.5
-                  else
-                      3
-                  end
-            if vbefore.nil? or vafter.nil?
-                return nil
-            end
-            h[c] = vbefore + ((vafter - vbefore)/div)
-        }
-        return h
+        return hash[ks[idx]]
     end
 end
 
@@ -84,14 +69,14 @@ debt = {}
 debtcsv = IO.readlines("debt.csv")[1..-1]
 debth = aggbyfield(0, debtcsv)
 debth.each { |d,lines|
-    m = ((3 * d[-2..-2].to_i) + 1) % 12
-    y = d[1..4].to_i + (m == 1 ? 1 : 0)
+    m = 3 * d[-2..-2].to_i
+    y = d[1..4].to_i
     datestr = m.to_s + "/" + y.to_s
     date = Date.strptime(datestr, "%m/%Y")
     debt[date] = {} unless debt.has_key?(date)
     lines.each { |l|
         country = EU12.find { |c| l.split(/,/)[1] =~ Regexp.new(c) }
-        debt[date][country] = cv(l.split(/,/)[5])
+        debt[date][repl[country]] = cv(l.split(/,/)[5])
     }
 }
 
@@ -101,14 +86,14 @@ deficitcsv = IO.readlines("deficit.csv")[5..-1]
 deforder = [0, 1, 4, 11, 2, 3, 5, 6, 7, 8, 9, 10]
 deficitcsv.each { |l|
     d = l.split(/\t/)[0]
-    m = ((3 * d[-2..-2].to_i) + 1) % 12
-    y = d[1..4].to_i + (m == 1 ? 1 : 0)
+    m = 3 * d[-2..-2].to_i
+    y = d[1..4].to_i
     datestr = m.to_s + "/" + y.to_s
     date = Date.strptime(datestr, "%m/%Y")
     if date >= firstdate
         deficit[date] = {} unless deficit.has_key?(date)
         deforder.each_with_index { |i,j|
-            deficit[date][EU12[i]] = cv(l.split(/\t/)[j+1])
+            deficit[date][repl[EU12[i]]] = cv(l.split(/\t/)[j+1])
         }
     end
 }
@@ -118,14 +103,14 @@ gdpgrowth = {}
 gdpgcsv = IO.readlines("gdp-change.csv")[1..-1]
 gdpgh = aggbyfield(0, gdpgcsv)
 gdpgh.each { |d,lines|
-    m = ((3 * d[-2..-2].to_i) + 1) % 12
-    y = d[1..4].to_i + (m == 1 ? 1 : 0)
+    m = 3 * d[-2..-2].to_i
+    y = d[1..4].to_i
     datestr = m.to_s + "/" + y.to_s
     date = Date.strptime(datestr, "%m/%Y")
     gdpgrowth[date] = {} unless gdpgrowth.has_key?(date)
     lines.each { |l|
         country = EU12.find { |c| l.split(/,/)[1] =~ Regexp.new(c) }
-        gdpgrowth[date][country] = cv(l.split(/,/)[5])
+        gdpgrowth[date][repl[country]] = cv(l.split(/,/)[5])
     }
 }
 
@@ -140,7 +125,7 @@ inflationcsv.each { |l|
     if date >= firstdate
         inflation[date] = {} unless inflation.has_key?(date)
         iorder.each_with_index { |i,j|
-            inflation[date][EU12[i]] = cv(l.split(/,/)[j+1])
+            inflation[date][repl[EU12[i]]] = cv(l.split(/,/)[j+1])
         }
     end
 }
@@ -156,7 +141,7 @@ interestcsv.each { |l|
     if date >= firstdate
         interest[date] = {} unless interest.has_key?(date)
         inorder.each_with_index { |i,j|
-            interest[date][EU12[i]] = cv(l.split(/,/)[j+1]) unless i == -1
+            interest[date][repl[EU12[i]]] = cv(l.split(/,/)[j+1]) unless i == -1
         }
     end
 }
@@ -172,7 +157,7 @@ unemploymentcsv.each { |l|
     if date >= firstdate
         unemployment[date] = {} unless unemployment.has_key?(date)
         uorder.each_with_index { |i,j|
-            unemployment[date][EU12[i]] = cv(l.split(/,/)[j+1])
+            unemployment[date][repl[EU12[i]]] = cv(l.split(/,/)[j+1])
         }
     end
 }
@@ -182,8 +167,8 @@ investment = {}
 investmentcsv = IO.readlines("gdp-investment-oecd.csv")[1..-1]
 investmenth = aggbyfield(-3, investmentcsv)
 investmenth.each { |d,lines|
-    m = ((3 * d[2..2].to_i) + 1) % 12
-    y = d[-5..-2].to_i + (m == 1 ? 1 : 0)
+    m = 3 * d[2..2].to_i
+    y = d[-5..-2].to_i
     datestr = m.to_s + "/" + y.to_s
     date = Date.strptime(datestr, "%m/%Y")
     investment[date] = {} unless investment.has_key?(date)
@@ -198,11 +183,11 @@ investmenth.each { |d,lines|
         end
     }
     EU12.each { |c|
-        investment[date][c] = if inv[c].nil? or gdp[c].nil?
-                                  nil
-                              else
-                                  (inv[c] / gdp[c]) * 100
-                              end
+        investment[date][repl[c]] = if inv[c].nil? or gdp[c].nil?
+                                        nil
+                                    else
+                                        (inv[c] / gdp[c]) * 100
+                                    end
     }
 }
 
@@ -213,12 +198,12 @@ pddates = ["2006Q1", "2006Q2", "2006Q3", "2006Q4", "2007Q1", "2007Q2", "2007Q3",
 edebtcsv.each { |l|
     country = EU12.find { |c| l.split(/,/)[0] =~ Regexp.new(c) }
     pddates.each_with_index { |d,i|
-        m = ((3 * d[-1..-1].to_i) + 1) % 12
-        y = d[0..3].to_i + (m == 1 ? 1 : 0)
+        m = 3 * d[-1..-1].to_i
+        y = d[0..3].to_i
         datestr = m.to_s + "/" + y.to_s
         date = Date.strptime(datestr, "%m/%Y")
         edebt[date] = {} unless edebt.has_key?(date)
-        edebt[date][country] = cv(l.split(/,/)[i+4])
+        edebt[date][repl[country]] = cv(l.split(/,/)[i+4])
     }
 }
 
@@ -232,7 +217,7 @@ gdpdollarcsv.each { |l|
         gdates.each_with_index { |d,i|
             date = Date.strptime(d, "%Y")
             gdpdollar[date] = {} unless gdpdollar.has_key?(date)
-            gdpdollar[date][country] = cv(splits[i+4]) * 1000000000
+            gdpdollar[date][repl[country]] = cv(splits[i+4]) * 1000000000
         }
     end
 }
@@ -266,60 +251,60 @@ interest.keys.sort.each { |k|
     tmp["debt"] = ihash
     tmp["debt"]["min"] = vs.min
     tmp["debt"]["max"] = vs.max
-    tmp["debt"]["median"] = med(vs)
+    tmp["debt"]["med"] = med(vs)
 
     ihash = interpolate(k, deficit)
     next if ihash.nil? or ihash.values.any? { |x| x.nil? }
     vs = ihash.values.sort
-    tmp["deficit"] = ihash
-    tmp["deficit"]["min"] = vs.min
-    tmp["deficit"]["max"] = vs.max
-    tmp["deficit"]["median"] = med(vs)
+    tmp["def"] = ihash
+    tmp["def"]["min"] = vs.min
+    tmp["def"]["max"] = vs.max
+    tmp["def"]["med"] = med(vs)
 
     ihash = interpolate(k, gdpgrowth)
     next if ihash.nil? or ihash.values.any? { |x| x.nil? }
     vs = ihash.values.sort
-    tmp["gdpgrowth"] = ihash
-    tmp["gdpgrowth"]["min"] = vs.min
-    tmp["gdpgrowth"]["max"] = vs.max
-    tmp["gdpgrowth"]["median"] = med(vs)
+    tmp["gdpd"] = ihash
+    tmp["gdpd"]["min"] = vs.min
+    tmp["gdpd"]["max"] = vs.max
+    tmp["gdpd"]["med"] = med(vs)
 
     next if inflation[k].values.any? { |x| x.nil? }
     vs = inflation[k].values.sort
-    tmp["inflation"] = inflation[k]
-    tmp["inflation"]["min"] = vs.min
-    tmp["inflation"]["max"] = vs.max
-    tmp["inflation"]["median"] = med(vs)
+    tmp["inf"] = inflation[k]
+    tmp["inf"]["min"] = vs.min
+    tmp["inf"]["max"] = vs.max
+    tmp["inf"]["med"] = med(vs)
 
     next if interest[k].values.any? { |x| x.nil? }
     vs = interest[k].values.sort
-    tmp["interest"] = interest[k]
-    tmp["interest"]["min"] = vs.min
-    tmp["interest"]["max"] = vs.max
-    tmp["interest"]["median"] = med(vs)
+    tmp["int"] = interest[k]
+    tmp["int"]["min"] = vs.min
+    tmp["int"]["max"] = vs.max
+    tmp["int"]["med"] = med(vs)
 
     next if unemployment[k].values.any? { |x| x.nil? }
     vs = unemployment[k].values.sort
-    tmp["unemployment"] = unemployment[k]
-    tmp["unemployment"]["min"] = vs.min
-    tmp["unemployment"]["max"] = vs.max
-    tmp["unemployment"]["median"] = med(vs)
+    tmp["unemp"] = unemployment[k]
+    tmp["unemp"]["min"] = vs.min
+    tmp["unemp"]["max"] = vs.max
+    tmp["unemp"]["med"] = med(vs)
 
-    #ihash = interpolate(k, investment)
-    #next if ihash.nil? or ihash.values.any? { |x| x.nil? }
-    #vs = ihash.values.sort
-    #tmp["investment"] = ihash
-    #tmp["investment"]["min"] = vs.min
-    #tmp["investment"]["max"] = vs.max
-    #tmp["investment"]["median"] = med(vs)
+    ihash = interpolate(k, investment)
+    next if ihash.nil? or ihash.values.any? { |x| x.nil? }
+    vs = ihash.values.sort
+    tmp["inv"] = ihash
+    tmp["inv"]["min"] = vs.min
+    tmp["inv"]["max"] = vs.max
+    tmp["inv"]["med"] = med(vs)
 
     ihash = interpolate(k, edebt)
     next if ihash.nil? or ihash.values.any? { |x| x.nil? }
     vs = ihash.values.sort
-    tmp["externaldebt"] = ihash
-    tmp["externaldebt"]["min"] = vs.min
-    tmp["externaldebt"]["max"] = vs.max
-    tmp["externaldebt"]["median"] = med(vs)
+    tmp["edebt"] = ihash
+    tmp["edebt"]["min"] = vs.min
+    tmp["edebt"]["max"] = vs.max
+    tmp["edebt"]["med"] = med(vs)
 
     data[k] = tmp
 }
