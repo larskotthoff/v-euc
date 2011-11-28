@@ -298,15 +298,15 @@ interest.keys.sort.each { |k|
     tmp["inv"]["max"] = vs.max
     tmp["inv"]["med"] = med(vs)
 
-    ihash = interpolate(k, edebt)
-    next if ihash.nil? or ihash.values.any? { |x| x.nil? }
-    ihashtmp = ihash.dup
-    ihashtmp.delete("L")
-    vs = ihashtmp.values.sort
-    tmp["edebt"] = ihash
-    tmp["edebt"]["min"] = vs.min
-    tmp["edebt"]["max"] = vs.max
-    tmp["edebt"]["med"] = med(vs)
+    #ihash = interpolate(k, edebt)
+    #next if ihash.nil? or ihash.values.any? { |x| x.nil? }
+    #ihashtmp = ihash.dup
+    #ihashtmp.delete("L")
+    #vs = ihashtmp.values.sort
+    #tmp["edebt"] = ihash
+    #tmp["edebt"]["min"] = vs.min
+    #tmp["edebt"]["max"] = vs.max
+    #tmp["edebt"]["med"] = med(vs)
 
     data[k] = tmp
 }
