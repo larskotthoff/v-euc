@@ -16,8 +16,12 @@ h1 {
     font-size: 4em;
     margin: 0 0 0;
 }
-path.spread {
+path.max {
     fill: #88f;
+    stroke: none;
+}
+path.min {
+    fill: #fff;
     stroke: none;
 }
 path.med {
@@ -67,13 +71,21 @@ path.med {
                 "Investments [%GDP]", "Inflation [%]", "Unemployment [%]"]
             width = window.innerWidth * 0.7,
             height = window.innerHeight,
-            r = (d3.min([width, height]) / 2) - margin,
+            r = (d3.min([width, height]) / 2) - 2 * margin,
             svg = d3.select("#graph")
                 .append("svg:svg")
                 .attr("height", height)
                 .attr("width", width),
             ctr = svg.append("svg:g").attr("transform", "translate(" + width/2 +
                 "," + height/2 + ")");
+
+        function vf(f) {
+            if(f >= 100 || f <= -100) {
+                return Math.round(f);
+            } else {
+                return f.toFixed(1);
+            }
+        }
 
         d3.json("eu.json", function(json) {
             var minses = $.map(measures, function(m) {
@@ -89,52 +101,85 @@ path.med {
                 scales = $.map(measures, function(m, i) {
                     return d3.scale.linear()
                         .domain([minses[i], maxes[i]])
-                        .range([0, r]);
-                }),
-                line = d3.svg.line.radial()
-                    .radius(function(e, i) {
-                        return scales[i%measures.length](e.value.med);
+                        .range([margin, r]);
+                });
+
+            function line(f) {
+                return d3.svg.line()
+                    .x(function(e, i) {
+                        var a = i * (2 * Math.PI / measures.length),
+                            l = scales[i%measures.length](f(e.value));
+                        return Math.sin(a) * l;
                     })
-                    .angle(function(e, i) {
-                        return (i % measures.length) *
-                            (2 * Math.PI / measures.length);
-                    }),
-                ring = d3.svg.area.radial()
-                    .innerRadius(function(e, i) {
-                        return scales[i%measures.length](e.value.min);
-                    })
-                    .outerRadius(function(e, i) {
-                        return scales[i%measures.length](e.value.max);
-                    })
-                    .angle(function(e, i) {
-                        return (i % measures.length) *
-                            (2 * Math.PI / measures.length);
+                    .y(function(e, i) {
+                        var a = i * (2 * Math.PI / measures.length),
+                            l = scales[i%measures.length](f(e.value));
+                        return Math.cos(a) * l;
                     });
+            }
 
             var dat = d3.entries(json[json.length-1][1]).sort(function(a, b) {
                 return measures.indexOf(a.key) - measures.indexOf(b.key);
             });
-            ctr.selectAll("path.spread")
-                .data([dat.concat(dat[0])])
-                .enter()
-                .append("svg:path")
-                .attr("class", "spread")
-                .attr("d", ring);
-            ctr.selectAll("path.med")
-                .data([dat.concat(dat[0])])
-                .enter()
-                .append("svg:path")
-                .attr("class", "med")
-                .attr("d", line);
+            $.each(["max", "min", "med"], function(j, m) {
+                ctr.selectAll("path." + m)
+                    .data([dat.concat(dat[0])])
+                    .enter()
+                    .append("svg:path")
+                    .attr("class", m)
+                    .attr("d", line(function(d) { return d[m]; }));
+            });
 
-            ctr.selectAll("text")
+            ctr.append("svg:circle")
+                .attr("class", "mark")
+                .attr("r", 2)
+                .attr("transform", function() {
+                    var i = measures.indexOf("def"),
+                        a = i * (2 * Math.PI / measures.length),
+                        l = scales[i](-3),
+                        x = Math.sin(a) * l,
+                        y = Math.cos(a) * l;
+                    return "translate(" + x + "," + y + ")";
+                });
+            ctr.append("svg:circle")
+                .attr("class", "mark")
+                .attr("r", 2)
+                .attr("transform", function() {
+                    var i = measures.indexOf("debt"),
+                        a = i * (2 * Math.PI / measures.length),
+                        l = scales[i](60),
+                        x = Math.sin(a) * l,
+                        y = Math.cos(a) * l;
+                    return "translate(" + x + "," + y + ")";
+                });
+
+            $.each(["max", "min"], function(j, m) {
+                ctr.selectAll("text." + m)
+                    .data(dat)
+                    .enter()
+                    .append("svg:text")
+                    .attr("class", m)
+                    .attr("transform", function(d, i) {
+                        var a = i * (2 * Math.PI / measures.length),
+                            l = scales[i](d.value[m]) +
+                                (j == 0 ? margin : -margin) / 2,
+                            x = Math.sin(a) * l,
+                            y = Math.cos(a) * l;
+                        return "translate(" + x + "," + y + ")";
+                    })
+                    .attr("text-anchor", "middle")
+                    .text(function(d) { return vf(d.value[m]); });
+            });
+
+            ctr.selectAll("text.label")
                 .data(labels)
                 .enter()
                 .append("svg:text")
+                .attr("class", "label")
                 .attr("transform", function(d, i) {
                     var a = i * (2 * Math.PI / measures.length),
-                        x = Math.sin(a) * (r + margin/2),
-                        y = Math.cos(a) * (r + margin/2);
+                        x = Math.sin(a) * (r + 1.5 * margin),
+                        y = Math.cos(a) * (r + 1.5 * margin);
                     return "translate(" + x + "," + y + ")";
                 })
                 .attr("text-anchor", function(d, i) {
