@@ -119,17 +119,20 @@ path.med {
                         .range([margin, r]);
                 });
 
+            function angle(i) {
+                return i * (2 * Math.PI / measures.length) +
+                    Math.PI/measures.length;
+            }
+
             function line(f) {
                 return d3.svg.line()
                     .x(function(e, i) {
-                        var a = i * (2 * Math.PI / measures.length),
-                            l = scales[i%measures.length](f(e.value));
-                        return Math.sin(a) * l;
+                        var l = scales[i%measures.length](f(e.value));
+                        return Math.sin(angle(i)) * l;
                     })
                     .y(function(e, i) {
-                        var a = i * (2 * Math.PI / measures.length),
-                            l = scales[i%measures.length](f(e.value));
-                        return Math.cos(a) * l;
+                        var l = scales[i%measures.length](f(e.value));
+                        return Math.cos(angle(i)) * l;
                     });
             }
 
@@ -152,11 +155,10 @@ path.med {
                         .data(dat)
                         .transition().duration(aduration)
                         .attr("transform", function(d, i) {
-                            var a = i * (2 * Math.PI / measures.length),
-                                l = scales[i](d.value[m]) +
+                            var l = scales[i](d.value[m]) +
                                     (j == 0 ? margin : -margin) / 2,
-                                x = Math.sin(a) * l,
-                                y = Math.cos(a) * l;
+                                x = Math.sin(angle(i)) * l,
+                                y = Math.cos(angle(i)) * l;
                             return "translate(" + x + "," + y + ")";
                         })
                         .text(function(d) { return vf(d.value[m]); });
@@ -181,10 +183,9 @@ path.med {
                 .attr("r", 2)
                 .attr("transform", function() {
                     var i = measures.indexOf("def"),
-                        a = i * (2 * Math.PI / measures.length),
                         l = scales[i](-3),
-                        x = Math.sin(a) * l,
-                        y = Math.cos(a) * l;
+                        x = Math.sin(angle(i)) * l,
+                        y = Math.cos(angle(i)) * l;
                     return "translate(" + x + "," + y + ")";
                 });
             ctr.append("svg:circle")
@@ -192,10 +193,9 @@ path.med {
                 .attr("r", 2)
                 .attr("transform", function() {
                     var i = measures.indexOf("debt"),
-                        a = i * (2 * Math.PI / measures.length),
                         l = scales[i](60),
-                        x = Math.sin(a) * l,
-                        y = Math.cos(a) * l;
+                        x = Math.sin(angle(i)) * l,
+                        y = Math.cos(angle(i)) * l;
                     return "translate(" + x + "," + y + ")";
                 });
 
@@ -206,11 +206,10 @@ path.med {
                     .append("svg:text")
                     .attr("class", m)
                     .attr("transform", function(d, i) {
-                        var a = i * (2 * Math.PI / measures.length),
-                            l = scales[i](d.value[m]) +
+                        var l = scales[i](d.value[m]) +
                                 (j == 0 ? margin : -margin) / 2,
-                            x = Math.sin(a) * l,
-                            y = Math.cos(a) * l;
+                            x = Math.sin(angle(i)) * l,
+                            y = Math.cos(angle(i)) * l;
                         return "translate(" + x + "," + y + ")";
                     })
                     .attr("text-anchor", "middle")
@@ -223,16 +222,14 @@ path.med {
                 .append("svg:text")
                 .attr("class", "label")
                 .attr("transform", function(d, i) {
-                    var a = i * (2 * Math.PI / measures.length),
-                        x = Math.sin(a) * (r + 1.5 * margin),
-                        y = Math.cos(a) * (r + 1.5 * margin);
+                    var x = Math.sin(angle(i)) * (r + 1.5 * margin),
+                        y = Math.cos(angle(i)) * (r + 1.5 * margin);
                     return "translate(" + x + "," + y + ")";
                 })
                 .attr("text-anchor", function(d, i) {
-                    var a = i * (2 * Math.PI / measures.length);
-                    if(a % Math.PI == 0) {
+                    if(angle(i) % Math.PI == 0) {
                         return "middle";
-                    } else if(a < Math.PI) {
+                    } else if(angle(i) < Math.PI) {
                         return "start";
                     } else {
                         return "end";
