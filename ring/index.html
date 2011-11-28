@@ -10,21 +10,20 @@
         <style type="text/css"> 
 body {
     font: 12px Verdana, Palatino, Helvetica, sans;
-    background: #ffdd73;
 }
 h1 {
     font-weight: normal;
     font-size: 4em;
     margin: 0 0 0;
 }
-line {
-    stroke: #bf8330;
-    stroke-width: 3;
-    stroke-linecap: round;
+path.spread {
+    fill: #88f;
+    stroke: none;
 }
-path {
-    stroke: #bf8330;
-    stroke-width: 1;
+path.med {
+    fill: none;
+    stroke: #f00;
+    stroke-width: 2;
     stroke-linecap: round;
 }
 .tick {
@@ -45,32 +44,39 @@ path {
     </head>
 
     <body>
-        <div style="position: fixed; top: 10px; left: 10px">
+        <div style="position: fixed; top: 10px; left: 10px; right: 70%;">
             <h1>Euro crisis</h1>
         </div>
-        <div id="graph" style="position: fixed; top: 15%;"></div>
-        <div style="position: fixed; bottom: 10px; left: 10px">
+        <div id="graph" style="position: fixed; left: 30%;"></div>
+        <div style="position: fixed; bottom: 10px; left: 10px;">
             Data from ECB, EuroStat, IMF, OECD, World Bank
         </div>
-        <div style="position: fixed; bottom: 10px; right: 10px">
+        <div style="position: fixed; bottom: 10px; right: 10px;">
             Lars Kotthoff 2011
         </div>
         <script type="text/javascript">
         (function () {
-        var margin = 50,
+        var margin = 30,
             countries = ["Austria", "Belgium", "Finland", "France", "Germany",
                 "Greece", "Ireland", "Italy", "Luxembourg", "Netherlands",
                 "Portugal", "Spain"],
-            width = window.innerWidth - 30,
-            height = window.innerHeight*0.8,
+            measures = ["edebt", "debt", "int", "def", "gdpd", "inv", "inf",
+                "unemp"]
+            labels = ["External debt [%GDP]", "Debt [%GDP]",
+                "Interest [%]", "Surplus [%GDP]", "GDP growth [%]",
+                "Investments [%GDP]", "Inflation [%]", "Unemployment [%]"]
+            width = window.innerWidth * 0.7,
+            height = window.innerHeight,
+            r = (d3.min([width, height]) / 2) - margin,
             svg = d3.select("#graph")
                 .append("svg:svg")
                 .attr("height", height)
-                .attr("width", width);
+                .attr("width", width),
+            ctr = svg.append("svg:g").attr("transform", "translate(" + width/2 +
+                "," + height/2 + ")");
 
         d3.json("eu.json", function(json) {
-            var measures = d3.keys(json[0][1]),
-                minses = $.map(measures, function(m) {
+            var minses = $.map(measures, function(m) {
                     return d3.min($.map(json, function(d) {
                         return d[1][m].min;
                     }));
@@ -79,11 +85,69 @@ path {
                     return d3.max($.map(json, function(d) {
                         return d[1][m].max;
                     }));
-                });
-            console.log(measures);
-            console.log(minses);
-            console.log(maxes);
+                }),
+                scales = $.map(measures, function(m, i) {
+                    return d3.scale.linear()
+                        .domain([minses[i], maxes[i]])
+                        .range([0, r]);
+                }),
+                line = d3.svg.line.radial()
+                    .radius(function(e, i) {
+                        return scales[i%measures.length](e.value.med);
+                    })
+                    .angle(function(e, i) {
+                        return (i % measures.length) *
+                            (2 * Math.PI / measures.length);
+                    }),
+                ring = d3.svg.area.radial()
+                    .innerRadius(function(e, i) {
+                        return scales[i%measures.length](e.value.min);
+                    })
+                    .outerRadius(function(e, i) {
+                        return scales[i%measures.length](e.value.max);
+                    })
+                    .angle(function(e, i) {
+                        return (i % measures.length) *
+                            (2 * Math.PI / measures.length);
+                    });
 
+            var dat = d3.entries(json[json.length-1][1]).sort(function(a, b) {
+                return measures.indexOf(a.key) - measures.indexOf(b.key);
+            });
+            ctr.selectAll("path.spread")
+                .data([dat.concat(dat[0])])
+                .enter()
+                .append("svg:path")
+                .attr("class", "spread")
+                .attr("d", ring);
+            ctr.selectAll("path.med")
+                .data([dat.concat(dat[0])])
+                .enter()
+                .append("svg:path")
+                .attr("class", "med")
+                .attr("d", line);
+
+            ctr.selectAll("text")
+                .data(labels)
+                .enter()
+                .append("svg:text")
+                .attr("transform", function(d, i) {
+                    var a = i * (2 * Math.PI / measures.length),
+                        x = Math.sin(a) * (r + margin/2),
+                        y = Math.cos(a) * (r + margin/2);
+                    return "translate(" + x + "," + y + ")";
+                })
+                .attr("text-anchor", function(d, i) {
+                    var a = i * (2 * Math.PI / measures.length);
+                    if(a % Math.PI == 0) {
+                        return "middle";
+                    } else if(a < Math.PI) {
+                        return "start";
+                    } else {
+                        return "end";
+                    }
+                })
+                .text(function(d) { return d; });
         });
         })();
         </script>
