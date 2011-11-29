@@ -7,7 +7,8 @@
         <script type="text/javascript" src="../../d3.layout.min.js"></script>
         <script type="text/javascript" src="../../d3.time.min.js"></script>
         <script type="text/javascript" src="../../jquery-1.6.2.min.js"></script>
-        <style type="text/css"> 
+        <script type="text/javascript" src="jquery-ui-1.8.16.custom.min.js"></script>
+        <style type="text/css">
 body {
     font: 12px Verdana, Palatino, Helvetica, sans;
 }
@@ -36,20 +37,23 @@ path.med {
     stroke-width: 2;
     stroke-linecap: round;
 }
-.tick {
-  stroke: #000;
-  stroke-width: 1;
-  fill: none;
-}
-.domain {
-  stroke-width: 2;
-  fill: none;
-  stroke: #000;
-  fill: none;
-}
-.title {
-    font-weight: bold;
-}
+
+.ui-widget-content { border: 1px solid #dddddd; background: #eeeeee; color: #333333; }
+.ui-widget-content a { color: #333333; }
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #cccccc; background: #f6f6f6; font-weight: bold; color: #1c94c4; }
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #fbcb09; background: #fdf5ce; font-weight: bold; color: #c77405; }
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid #fbd850; background: #ffffff; font-weight: bold; color: #eb8f00; }
+.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: #eb8f00; text-decoration: none; }
+
+.ui-slider { position: relative; text-align: left; }
+.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
+.ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
+
+.ui-slider-horizontal { height: .8em; }
+.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
+.ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
+.ui-slider-horizontal .ui-slider-range-min { left: 0; }
+.ui-slider-horizontal .ui-slider-range-max { right: 0; }
         </style>
     </head>
 
@@ -59,7 +63,10 @@ path.med {
         </div>
         <div id="timelabel" class="timelabel" style="position: fixed; left: 10px; bottom: 10%;">
         </div>
-        <div id="graph" style="position: fixed; left: 30%;"></div>
+        <div id="graph" style="position: fixed; left: 30%; bottom: 50px;"></div>
+        <div style="position: fixed; left: 30%; width: 68%; bottom: 30px; height: 30px;">
+            <div id="slider"></div>
+        </div>
         <div style="position: fixed; bottom: 10px; left: 10px;">
             Data from ECB, EuroStat, IMF, OECD, World Bank
         </div>
@@ -81,7 +88,7 @@ path.med {
                 "Interest [%]", "Surplus [%GDP]", "GDP growth [%]",
                 "Investments [%GDP]", "Inflation [%]", "Unemployment [%]"]
             width = window.innerWidth * 0.7,
-            height = window.innerHeight,
+            height = window.innerHeight - 50,
             r = (d3.min([width, height]) / 2) - 2 * margin,
             svg = d3.select("#graph")
                 .append("svg:svg")
@@ -237,12 +244,39 @@ path.med {
                 })
                 .text(function(d) { return d; });
 
+            // slider setup
+            $("#slider").slider({
+                min: 0,
+                max: json.length,
+                stop: function(ev, ui) {
+                    update(ui.value);
+                }
+            });
+            var prevyear = "";
+            $.each(json, function(i, d) {
+                var year = d[0].substr(0, 4);
+                if(year != prevyear) {
+                    $("#slider").append(
+                        '<div class="ui-slider-label" ' +
+                        'style="position: absolute; bottom: 20px; left:' +
+                        (i*100/json.length) + '%">' + year + '</div>');
+                    prevyear = year;
+                }
+            });
+            $("#slider")
+                .find('.ui-slider-label')
+                .each(function(){
+                    $(this).css('marginLeft', -$(this).width()/2);
+                });
+
+            /*
             (function next(idx) {
                 if(idx < json.length) {
                     update(idx);
                     setTimeout(function() { next(idx + 1); }, aduration);
                 }
             })(1);
+            */
         });
         })();
         </script>
