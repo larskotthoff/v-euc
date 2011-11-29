@@ -6,7 +6,7 @@ require 'date'
 EU12 = ["Austria", "Belgium", "Finland", "France", "Germany", "Greece", "Ireland", "Italy", "Luxembourg", "Netherlands", "Portugal", "Spain"]
 repl = {"Austria" => "A", "Belgium" => "B", "Finland" => "Fi", "France" => "Fr", "Germany" => "Ge", "Greece" => "Gr", "Ireland" => "Ir", "Italy" => "It", "Luxembourg" => "L", "Netherlands" => "N", "Portugal" => "P" , "Spain" => "S"}
 
-firstdate = Date.strptime("01/04/2006", "%d/%m/%Y")
+firstdate = Date.strptime("01/01/2006", "%d/%m/%Y")
 
 def med(vs)
     if vs.length.odd?
