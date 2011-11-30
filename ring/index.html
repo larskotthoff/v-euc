@@ -81,6 +81,7 @@ path.med {
         var margin = 30,
             aduration = 750,
             playing = false,
+            updating = false,
             idformat = d3.time.format("%Y/%m"),
             odformat = d3.time.format("%B %Y"),
             countries = ["Austria", "Belgium", "Finland", "France", "Germany",
@@ -254,7 +255,11 @@ path.med {
                 max: json.length-1,
                 slide: function(ev, ui) {
                     stopPlay();
-                    update(ui.value, 0);
+                    if(!updating) {
+                        updating = true;
+                        update(ui.value, 0);
+                        updating = false;
+                    }
                 },
                 change: function(ev, ui) {
                     update(ui.value, aduration);
