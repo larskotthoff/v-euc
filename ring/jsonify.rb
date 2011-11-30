@@ -4,7 +4,7 @@ require 'json'
 require 'date'
 
 EU12 = ["Austria", "Belgium", "Finland", "France", "Germany", "Greece", "Ireland", "Italy", "Luxembourg", "Netherlands", "Portugal", "Spain"]
-repl = {"Austria" => "A", "Belgium" => "B", "Finland" => "Fi", "France" => "Fr", "Germany" => "Ge", "Greece" => "Gr", "Ireland" => "Ir", "Italy" => "It", "Luxembourg" => "L", "Netherlands" => "N", "Portugal" => "P" , "Spain" => "S"}
+repl = {"Austria" => "Au", "Belgium" => "Be", "Finland" => "Fi", "France" => "Fr", "Germany" => "Ge", "Greece" => "Gr", "Ireland" => "Ir", "Italy" => "It", "Luxembourg" => "Lu", "Netherlands" => "Ne", "Portugal" => "Po" , "Spain" => "Sp"}
 
 firstdate = Date.strptime("01/01/2006", "%d/%m/%Y")
 
@@ -29,7 +29,7 @@ def aggbyfield(field, lines)
     return h
 end
 
-def cv(s)
+def cv(s, round = true)
     if s.nil? or s.empty? then
         nil
     else
@@ -37,7 +37,12 @@ def cv(s)
         if sp.empty? or sp =~ /^:$/
             nil
         else
-            sp.gsub(/\s+/, "").to_f
+            num = sp.gsub(/\s+/, "").to_f
+            if round
+                (num * 100).round.to_f / 100
+            else
+                num
+            end
         end
     end
 end
@@ -173,7 +178,7 @@ investmenth.each { |d,lines|
             investment[date][repl[c]] = if inv[c].nil? or gdp[c].nil?
                                             nil
                                         else
-                                            (inv[c] / gdp[c]) * 100
+                                            ((inv[c] / gdp[c]) * 10000).round.to_f / 100
                                         end
         }
     }
@@ -207,7 +212,7 @@ gdpdollarcsv.each { |l|
         gdates.each_with_index { |d,i|
             date = Date.strptime(d, "%Y")
             gdpdollar[date] = {} unless gdpdollar.has_key?(date)
-            gdpdollar[date][repl[country]] = cv(splits[i+4]) * 1000000000
+            gdpdollar[date][repl[country]] = cv(splits[i+4], false) * 1000000000
         }
     end
 }
@@ -217,7 +222,7 @@ edebt.each { |d,cs|
         edebt[d][c] = if v.nil? or gdpdollar[gdpdollardate][c].nil?
                           nil
                       else
-                          (v / gdpdollar[gdpdollardate][c]) * 100
+                          ((v / gdpdollar[gdpdollardate][c]) * 10000).round.to_f / 100
                       end
     }
 }
