@@ -64,6 +64,9 @@ path.med {
         <div id="timelabel" class="timelabel" style="position: fixed; left: 10px; bottom: 10%;">
         </div>
         <div id="graph" style="position: fixed; left: 30%; bottom: 50px;"></div>
+        <div style="position: fixed; left: 26%; bottom: 30px; height: 30px;">
+            <button id="pcontrol">play</button>
+        </div>
         <div style="position: fixed; left: 30%; width: 68%; bottom: 30px; height: 30px;">
             <div id="slider"></div>
         </div>
@@ -77,6 +80,7 @@ path.med {
         (function () {
         var margin = 30,
             aduration = 750,
+            playing = false,
             idformat = d3.time.format("%Y/%m"),
             odformat = d3.time.format("%B %Y"),
             countries = ["Austria", "Belgium", "Finland", "France", "Germany",
@@ -249,7 +253,11 @@ path.med {
                 min: 0,
                 max: json.length-1,
                 slide: function(ev, ui) {
+                    stopPlay();
                     update(ui.value, 0);
+                },
+                change: function(ev, ui) {
+                    update(ui.value, aduration);
                 }
             });
             var prevyear = "";
@@ -269,14 +277,34 @@ path.med {
                     $(this).css('marginLeft', -$(this).width()/2);
                 });
 
-            /*
-            (function next(idx) {
-                if(idx < json.length) {
-                    update(idx);
-                    setTimeout(function() { next(idx + 1); }, aduration);
+            function nextFrame() {
+                var idx = $("#slider").slider("value");
+                if(playing && idx < json.length) {
+                    $("#slider").slider("value", idx + 1);
+                    setTimeout(function() { nextFrame(); }, aduration);
                 }
-            })(1);
-            */
+                if(idx == json.length-1) {
+                    stopPlay();
+                }
+            }
+            function stopPlay() {
+                playing = false;
+                $("#pcontrol").html("play");
+            }
+            function togglePlay() {
+                if(playing) {
+                    stopPlay();
+                } else {
+                    var idx = $("#slider").slider("value");
+                    if(idx == json.length-1) {
+                        $("#slider").slider("value", 0);
+                    }
+                    playing = true;
+                    $("#pcontrol").html("stop");
+                    nextFrame();
+                }
+            }
+            d3.select("#pcontrol").on("click", togglePlay);
         });
         })();
         </script>
