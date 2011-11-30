@@ -23,6 +23,15 @@ h1 {
     margin: 0 0 0;
     color: #444;
 }
+
+path {
+    fill: none;
+    stroke-width: 2;
+}
+
+path.label {
+    stroke-width: 5;
+}
 path.max {
     fill: #88f;
     stroke: none;
@@ -33,9 +42,48 @@ path.min {
 }
 path.med {
     fill: none;
-    stroke: #f00;
-    stroke-width: 2;
+    stroke: #00f;
     stroke-linecap: round;
+}
+
+.Au {
+    stroke: #f00;
+}
+.Be {
+    stroke: #000;
+}
+.Fi {
+    stroke: #f60;
+}
+.Fr {
+    stroke: #060;
+}
+.Ge {
+    stroke: #390;
+}
+.Gr {
+    stroke: #906;
+}
+.Ir {
+    stroke: #990;
+}
+.It {
+    stroke: #f3c;
+}
+.Lu {
+    stroke: #ff0;
+}
+.Ne {
+    stroke: #930;
+}
+.Po {
+    stroke: #666;
+}
+.Sp {
+    stroke: #0f0;
+}
+.hidden {
+    stroke: none;
 }
 
 .ui-widget-content { border: 1px solid #dddddd; background: #eeeeee; color: #333333; }
@@ -58,10 +106,14 @@ path.med {
     </head>
 
     <body>
-        <div style="position: fixed; top: 10px; left: 10px; right: 70%;">
-            <h1>Euro crisis</h1>
+        <div style="position: fixed; top: 10px; left: 10px;">
+            <h1>Components of a crisis</h1>
         </div>
         <div id="timelabel" class="timelabel" style="position: fixed; left: 10px; bottom: 10%;">
+        </div>
+        <div style="position: fixed; left: 10px; top: 80px; height: 70%;">
+            <table style="padding: 10px; border-spacing: 10px;" id="cselector">
+            </table>
         </div>
         <div id="graph" style="position: fixed; left: 30%; bottom: 50px;"></div>
         <div style="position: fixed; left: 26%; bottom: 30px; height: 30px;">
@@ -101,6 +153,27 @@ path.med {
                 .attr("width", width),
             ctr = svg.append("svg:g").attr("transform", "translate(" + width/2 +
                 "," + height/2 + ")");
+
+        $.each(countries, function(i, c) {
+            var cid = c.substr(0, 2),
+                tr = d3.select("#cselector").append("tr");
+            tr.append("td").append("input")
+                .attr("type", "checkbox")
+                .on("click", function() { toggleCLine(cid); });
+            tr.append("td").html(c);
+            tr.append("td").append("svg:svg")
+                .attr("width", 20).attr("height", 5)
+                .append("svg:path")
+                .attr("d", "M0,2 20,2")
+                .attr("class", cid).classed("label", true)
+                .classed("hidden", true);
+        });
+
+        function toggleCLine(cid) {
+            var p = d3.selectAll("." + cid),
+                c = p.classed("hidden");
+            p.classed("hidden", c ^ true);
+        }
 
         function vf(f) {
             if(f >= 100 || f <= -100) {
@@ -162,6 +235,13 @@ path.med {
                         .transition().duration(delay)
                         .attr("d", line(function(d) { return d[m]; }));
                 });
+                $.each(countries, function(j, c) {
+                    var cls = c.substr(0, 2);
+                    ctr.selectAll("path." + cls)
+                        .data([dat.concat(dat[0])])
+                        .transition().duration(delay)
+                        .attr("d", line(function(d) { return d[cls]; }));
+                });
                 $.each(["max", "min"], function(j, m) {
                     ctr.selectAll("text." + m)
                         .data(dat)
@@ -188,6 +268,16 @@ path.med {
                     .append("svg:path")
                     .attr("class", m)
                     .attr("d", line(function(d) { return d[m]; }));
+            });
+            $.each(countries, function(j, c) {
+                var cls = c.substr(0, 2);
+                ctr.selectAll("path." + cls)
+                    .data([dat.concat(dat[0])])
+                    .enter()
+                    .append("svg:path")
+                    .attr("class", cls)
+                    .classed("hidden", true)
+                    .attr("d", line(function(d) { return d[cls]; }));
             });
 
             ctr.append("svg:circle")

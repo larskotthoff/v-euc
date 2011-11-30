@@ -4,7 +4,7 @@ require 'json'
 require 'date'
 
 EU12 = ["Austria", "Belgium", "Finland", "France", "Germany", "Greece", "Ireland", "Italy", "Luxembourg", "Netherlands", "Portugal", "Spain"]
-repl = {"Austria" => "Au", "Belgium" => "Be", "Finland" => "Fi", "France" => "Fr", "Germany" => "Ge", "Greece" => "Gr", "Ireland" => "Ir", "Italy" => "It", "Luxembourg" => "Lu", "Netherlands" => "Ne", "Portugal" => "Po" , "Spain" => "Sp"}
+repl = {"Austria" => "Au", "Belgium" => "Be", "Finland" => "Fi", "France" => "Fr", "Germany" => "Ge", "Greece" => "Gr", "Ireland" => "Ir", "Italy" => "It", "Luxembourg" => "Lu", "Netherlands" => "Ne", "Portugal" => "Po", "Spain" => "Sp"}
 
 firstdate = Date.strptime("01/01/2006", "%d/%m/%Y")
 
