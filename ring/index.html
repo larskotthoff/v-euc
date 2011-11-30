@@ -23,6 +23,10 @@ h1 {
     margin: 0 0 0;
     color: #444;
 }
+.back {
+    stroke: #fff;
+    stroke-width: 4;
+}
 
 path {
     fill: none;
@@ -132,7 +136,6 @@ path.med {
         var margin = 30,
             aduration = 750,
             playing = false,
-            updating = false,
             idformat = d3.time.format("%Y/%m"),
             odformat = d3.time.format("%B %Y"),
             countries = ["Austria", "Belgium", "Finland", "France", "Germany",
@@ -159,13 +162,12 @@ path.med {
             tr.append("td").append("input")
                 .attr("type", "checkbox")
                 .on("click", function() { toggleCLine(cid); });
-            tr.append("td").html(c);
+            tr.append("td").style("font-size", "larger").html(c);
             tr.append("td").append("svg:svg")
                 .attr("width", 20).attr("height", 5)
                 .append("svg:path")
                 .attr("d", "M0,2 20,2")
-                .attr("class", cid).classed("label", true)
-                .classed("hidden", true);
+                .attr("class", cid + " label hidden");
         });
 
         function toggleCLine(cid) {
@@ -242,16 +244,21 @@ path.med {
                         .attr("d", line(function(d) { return d[cls]; }));
                 });
                 $.each(["max", "min"], function(j, m) {
-                    ctr.selectAll("text." + m)
+                    ctr.selectAll("g." + m)
                         .data(dat)
                         .transition().duration(delay)
                         .attr("transform", function(d, i) {
                             var l = scales[i](d.value[m]) +
-                                    (j == 0 ? margin : -margin) / 2,
+                                    (j == 0 ? margin : -margin) / 3,
                                 x = Math.sin(angle(i)) * l,
                                 y = Math.cos(angle(i)) * l;
                             return "translate(" + x + "," + y + ")";
-                        })
+                        });
+                     ctr.selectAll("text.back." + m)
+                        .data(dat)
+                        .text(function(d) { return vf(d.value[m]); });
+                     ctr.selectAll("text.front." + m)
+                        .data(dat)
                         .text(function(d) { return vf(d.value[m]); });
                 });
             }
@@ -274,8 +281,7 @@ path.med {
                     .data([dat.concat(dat[0])])
                     .enter()
                     .append("svg:path")
-                    .attr("class", cls)
-                    .classed("hidden", true)
+                    .attr("class", cls + " hidden")
                     .attr("d", line(function(d) { return d[cls]; }));
             });
 
@@ -301,18 +307,24 @@ path.med {
                 });
 
             $.each(["max", "min"], function(j, m) {
-                ctr.selectAll("text." + m)
+                var sel = ctr.selectAll("g." + m)
                     .data(dat)
                     .enter()
-                    .append("svg:text")
+                    .append("svg:g")
                     .attr("class", m)
                     .attr("transform", function(d, i) {
                         var l = scales[i](d.value[m]) +
-                                (j == 0 ? margin : -margin) / 2,
+                                (j == 0 ? margin : -margin) / 3,
                             x = Math.sin(angle(i)) * l,
                             y = Math.cos(angle(i)) * l;
                         return "translate(" + x + "," + y + ")";
-                    })
+                    });
+                sel.append("svg:text")
+                    .attr("class", m + " back")
+                    .attr("text-anchor", "middle")
+                    .text(function(d) { return vf(d.value[m]); });
+                sel.append("svg:text")
+                    .attr("class", m + " front")
                     .attr("text-anchor", "middle")
                     .text(function(d) { return vf(d.value[m]); });
             });
@@ -344,11 +356,7 @@ path.med {
                 max: json.length-1,
                 slide: function(ev, ui) {
                     stopPlay();
-                    if(!updating) {
-                        updating = true;
-                        update(ui.value, 0);
-                        updating = false;
-                    }
+                    update(ui.value, 0);
                 },
                 change: function(ev, ui) {
                     update(ui.value, aduration);
