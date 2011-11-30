@@ -25,7 +25,7 @@ h1 {
 }
 .back {
     stroke: #fff;
-    stroke-width: 4;
+    stroke-width: 3;
 }
 
 path {
@@ -355,11 +355,15 @@ path.med {
                 min: 0,
                 max: json.length-1,
                 slide: function(ev, ui) {
-                    stopPlay();
-                    update(ui.value, 0);
+                    if(ev.originalEvent) {
+                        stopPlay();
+                        update(ui.value, 0);
+                    }
                 },
                 change: function(ev, ui) {
-                    update(ui.value, aduration);
+                    if(!ev.originalEvent) {
+                        update(ui.value, aduration);
+                    }
                 }
             });
             var prevyear = "";
