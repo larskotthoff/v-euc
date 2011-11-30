@@ -25,7 +25,7 @@ h1 {
 }
 .back {
     stroke: #fff;
-    stroke-width: 3;
+    stroke-width: 2.5;
 }
 
 path {
@@ -148,7 +148,7 @@ path.med {
                 "Investments [%GDP]", "Inflation [%]", "Unemployment [%]"]
             width = window.innerWidth * 0.7,
             height = window.innerHeight - 60,
-            r = (d3.min([width, height]) / 2) - 2 * margin,
+            r = (d3.min([width, height]) / 2) - 1.5 * margin,
             svg = d3.select("#graph")
                 .append("svg:svg")
                 .attr("height", height)
@@ -202,7 +202,11 @@ path.med {
                 scales = $.map(measures, function(m, i) {
                     return d3.scale.linear()
                         .domain([minses[i], maxes[i]])
-                        .range([margin, r]);
+                        .range([margin, r]).nice();
+                })
+                axes = $.map(measures, function(m, i) {
+                    return d3.svg.axis().scale(scales[i]).orient("left")
+                        .tickSize(0);
                 });
 
             function angle(i) {
@@ -254,12 +258,14 @@ path.med {
                                 y = Math.cos(angle(i)) * l;
                             return "translate(" + x + "," + y + ")";
                         });
+                    /*
                      ctr.selectAll("text.back." + m)
                         .data(dat)
                         .text(function(d) { return vf(d.value[m]); });
                      ctr.selectAll("text.front." + m)
                         .data(dat)
                         .text(function(d) { return vf(d.value[m]); });
+                    */
                 });
             }
 
@@ -306,6 +312,7 @@ path.med {
                     return "translate(" + x + "," + y + ")";
                 });
 
+            /*
             $.each(["max", "min"], function(j, m) {
                 var sel = ctr.selectAll("g." + m)
                     .data(dat)
@@ -328,6 +335,25 @@ path.med {
                     .attr("text-anchor", "middle")
                     .text(function(d) { return vf(d.value[m]); });
             });
+            */
+
+            $.each(axes, function(i, a) {
+                $.each([true, false], function(j, v) {
+                    ctr.append("svg:g")
+                        .attr("transform",
+                            "rotate(" + -(angle(i)*180/Math.PI) + ")")
+                        .call(a)
+                        .selectAll("text")
+                        .attr("text-anchor", "middle")
+                        .attr("class", v ? "back" : "")
+                        .attr("transform", function(d) {
+                            var x = d3.select(this).attr("x"),
+                                y = d3.select(this).attr("y");
+                            return "rotate(" + (angle(i)*180/Math.PI) + " " +
+                                    x + " " + y + ")";
+                        });
+                });
+            });
 
             ctr.selectAll("text.label")
                 .data(labels)
@@ -335,8 +361,8 @@ path.med {
                 .append("svg:text")
                 .attr("class", "label")
                 .attr("transform", function(d, i) {
-                    var x = Math.sin(angle(i)) * (r + 1.5 * margin),
-                        y = Math.cos(angle(i)) * (r + 1.5 * margin);
+                    var x = Math.sin(angle(i)) * (r + margin),
+                        y = Math.cos(angle(i)) * (r + margin);
                     return "translate(" + x + "," + y + ")";
                 })
                 .attr("text-anchor", function(d, i) {
