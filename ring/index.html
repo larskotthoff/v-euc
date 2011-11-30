@@ -106,21 +106,21 @@ path.med {
     </head>
 
     <body>
-        <div style="position: fixed; top: 10px; left: 10px;">
-            <h1>Components of a crisis</h1>
-        </div>
-        <div id="timelabel" class="timelabel" style="position: fixed; left: 10px; bottom: 10%;">
-        </div>
-        <div style="position: fixed; left: 10px; top: 80px; height: 70%;">
+        <h1>Components of a crisis</h1>
+        <div style="position: relative; height: 70%;">
             <table style="padding: 10px; border-spacing: 10px;" id="cselector">
             </table>
         </div>
-        <div id="graph" style="position: fixed; left: 30%; bottom: 50px;"></div>
-        <div style="position: fixed; left: 26%; bottom: 30px; height: 30px;">
-            <button id="pcontrol">play</button>
+        <div id="timelabel" class="timelabel" style="position: relative;">
         </div>
-        <div style="position: fixed; left: 30%; width: 68%; bottom: 30px; height: 30px;">
-            <div id="slider"></div>
+        <div style="position: fixed; left: 30%; top: 10px; bottom: 50px;">
+            <div id="graph"></div>
+            <div style="position: relative; top: -30px;">
+                <button id="pcontrol" style="position: relative; top: 10px;">
+                    play
+                </button>
+                <div id="slider" style="left: 80px; width: 90%;"></div>
+            </div>
         </div>
         <div style="position: fixed; bottom: 10px; left: 10px;">
             Data from ECB, EuroStat, IMF, OECD, World Bank
@@ -145,7 +145,7 @@ path.med {
                 "Interest [%]", "Surplus [%GDP]", "GDP growth [%]",
                 "Investments [%GDP]", "Inflation [%]", "Unemployment [%]"]
             width = window.innerWidth * 0.7,
-            height = window.innerHeight - 50,
+            height = window.innerHeight - 60,
             r = (d3.min([width, height]) / 2) - 2 * margin,
             svg = d3.select("#graph")
                 .append("svg:svg")
