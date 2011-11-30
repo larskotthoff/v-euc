@@ -117,6 +117,16 @@ path.med {
 .ui-slider-horizontal .ui-slider-range-min { left: 0; }
 .ui-slider-horizontal .ui-slider-range-max { right: 0; }
 
+.ui-slider-tick {
+    position: absolute;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-right: 0;
+    border-top: 0;
+    border-bottom: 0;
+    height: .8em;
+}
+
 .ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
 .ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative;  }
 .ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .1em 0; } 
@@ -334,9 +344,7 @@ path.med {
             }
 
             function update(idx, delay) {
-                setTimeout(function() {
-                    d3.select("#timelabel").html(fd(json[idx][0]));
-                }, delay);
+                d3.select("#timelabel").html(fd(json[idx][0]));
                 var dat = d3.entries(json[idx][1]).sort(function(a, b) {
                     return measures.indexOf(a.key) -
                             measures.indexOf(b.key);
@@ -506,10 +514,16 @@ path.med {
                     $("#slider").append(
                         '<div class="ui-slider-label" ' +
                         'style="position: absolute; bottom: 20px; left:' +
-                        (i*100/json.length) + '%">' + year + '</div>');
+                        (i*100/(json.length-1)) + '%">' + year + '</div>');
                     prevyear = year;
                 }
             });
+            d3.select("#slider").selectAll("span").data(json).enter()
+                .append("span")
+                .attr("class", "ui-slider-tick")
+                .style("left", function(d, i) {
+                    return (i*100/(json.length-1)) + "%";
+                });
             $("#slider")
                 .find('.ui-slider-label')
                 .each(function(){
