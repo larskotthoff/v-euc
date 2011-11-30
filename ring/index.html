@@ -143,10 +143,10 @@ path.med {
                     });
             }
 
-            function update(idx) {
+            function update(idx, delay) {
                 setTimeout(function() {
                     d3.select("#timelabel").html(fd(json[idx][0]));
-                }, aduration);
+                }, delay);
                 var dat = d3.entries(json[idx][1]).sort(function(a, b) {
                     return measures.indexOf(a.key) -
                             measures.indexOf(b.key);
@@ -154,13 +154,13 @@ path.med {
                 $.each(["max", "min", "med"], function(j, m) {
                     ctr.selectAll("path." + m)
                         .data([dat.concat(dat[0])])
-                        .transition().duration(aduration)
+                        .transition().duration(delay)
                         .attr("d", line(function(d) { return d[m]; }));
                 });
                 $.each(["max", "min"], function(j, m) {
                     ctr.selectAll("text." + m)
                         .data(dat)
-                        .transition().duration(aduration)
+                        .transition().duration(delay)
                         .attr("transform", function(d, i) {
                             var l = scales[i](d.value[m]) +
                                     (j == 0 ? margin : -margin) / 2,
@@ -247,9 +247,9 @@ path.med {
             // slider setup
             $("#slider").slider({
                 min: 0,
-                max: json.length,
-                stop: function(ev, ui) {
-                    update(ui.value);
+                max: json.length-1,
+                slide: function(ev, ui) {
+                    update(ui.value, 0);
                 }
             });
             var prevyear = "";
