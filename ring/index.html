@@ -90,6 +90,17 @@ path.med {
     stroke: none;
 }
 
+.q {
+    font-size: x-large;
+    z-index: 10;
+}
+.q:hover {
+    color: #444;
+}
+
+.ui-widget { font: 12px Verdana, Palatino, Helvetica, sans; }
+.ui-widget-header { border: 1px solid #444; background: #666; color: #ffffff; font-weight: bold; }
+
 .ui-widget-content { border: 1px solid #444; background: #aaa; color: #333; }
 .ui-widget-content a { color: #333; }
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #444; background: #aaa; font-weight: bold; color: #333; }
@@ -105,11 +116,46 @@ path.med {
 .ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
 .ui-slider-horizontal .ui-slider-range-min { left: 0; }
 .ui-slider-horizontal .ui-slider-range-max { right: 0; }
+
+.ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
+.ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative;  }
+.ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .1em 0; } 
+.ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
+.ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
+.ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: right; }
+.ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
+.ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
+.ui-draggable .ui-dialog-titlebar { cursor: move; }
+
+.ui-resizable { position: relative;}
+.ui-resizable-handle { position: absolute;font-size: 0.1px;z-index: 99999; display: block; }
+.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
+.ui-resizable-n { cursor: n-resize; height: 7px; width: 100%; top: -5px; left: 0; }
+.ui-resizable-s { cursor: s-resize; height: 7px; width: 100%; bottom: -5px; left: 0; }
+.ui-resizable-e { cursor: e-resize; width: 7px; right: -5px; top: 0; height: 100%; }
+.ui-resizable-w { cursor: w-resize; width: 7px; left: -5px; top: 0; height: 100%; }
+.ui-resizable-se { cursor: se-resize; width: 12px; height: 12px; right: 1px; bottom: 1px; }
+.ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
+.ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
+.ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
+
+.ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.ui-helper-clearfix { display: inline-block; }
+/* required comment for clearfix to work in Opera \*/
+* html .ui-helper-clearfix { height:1%; }
+.ui-helper-clearfix { display:block; }
+/* end clearfix */
         </style>
     </head>
 
     <body>
         <h1>Components of a crisis</h1>
+        <div id="q" class="q" style="position: fixed; right: 10px; top: 10px;">
+            ?
+        </div>
         <div style="position: relative; height: 70%;">
             <table style="padding: 10px; border-spacing: 10px;" id="cselector">
             </table>
@@ -130,6 +176,67 @@ path.med {
         </div>
         <div style="position: fixed; bottom: 10px; right: 10px;">
             Lars Kotthoff 2011
+        </div>
+        <div id="info" title="What's all this then?">
+            <p>
+            This graphic attempts to visualise how the Eurozone crisis developed
+            over time. Seven key indicators are shown for the Eurozone and each
+            of the original 12 Eurozone members.
+            </p>
+
+            <p>
+            The outer radius of the ring shows the maximum within the Eurozone
+            for a given month and the inner radius the minimum. The thick blue
+            line shows the median.
+            <br/>
+            Select countries through the checkboxes on the left to show them in
+            the graph. Move the slider below the graph to see the data for a
+            specific month or click the "Play" icon to start an animation.
+            </p>
+
+            <p>
+            The scales of the indicators are arranged such that up in the graph
+            means good and down bad. The indicators are grouped such that the
+            ones on the left affect the private sector and population more
+            whereas the ones on the right affect the public sector and the
+            government.
+            </p>
+
+            <p>
+            The indicators are as follows.
+            <ul>
+                <li><strong>GDP growth.</strong> Increase in total economic
+                output.</li>
+                <li><strong>Surplus.</strong> Government surplus or
+                deficit.</li>
+                <li><strong>Interest.</strong> Interest rate payable on
+                government 10 year bonds.</li>
+                <li><strong>Debt.</strong> Total government debt.</li>
+                <li><strong>Unemployment.</strong> Overall unemployment
+                rate.</li>
+                <li><strong>Inflation.</strong> Change in price levels.</li>
+                <li><strong>Investments.</strong> Investments as measured by <a href="http://en.wikipedia.org/wiki/Gross_fixed_capital_formation">Gross fixed capital formation</a>.
+            </ul>
+            </p>
+
+            <p>
+            Compared to 2006, the picture at the end of 2011 is different in two
+            main ways. First, the ring has moved down by a lot, indicating that
+            the overall state of the economy is worse. Second, the ring is much
+            thicker, indicating that the discrepancies within the Eurozone are
+            much higher. This is especially true for interest rates and
+            unemployment.
+            </p>
+
+            <p>
+            For the purposes of this graph, the Eurozone is always composed of
+            the 12 countries listed on the left. Other countries joined the
+            Eurozone during the shown period, but their economies are relatively
+            well off and their joining would cause an overall improvement even
+            though the situation of the other countries has not changed.
+            <br/>
+            Some of the later numbers are estimates.
+            </p>
         </div>
         <script type="text/javascript">
         (function () {
@@ -437,6 +544,16 @@ path.med {
                 }
             }
             d3.select("#pcontrol").on("click", togglePlay);
+
+            function showInfo() {
+                $("#info").dialog('open');
+            }
+            $("#info").dialog({
+                autoOpen: false,
+                closeText: "x",
+                width: 600
+            });
+            d3.select("#q").on("click", showInfo);
         });
         })();
         </script>
