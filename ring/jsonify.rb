@@ -316,8 +316,28 @@ interest.keys.sort.each { |k|
     data[k] = tmp
 }
 
-jsondata = data.keys.sort.collect { |d|
-    [d.year.to_s + "/" + d.month.to_s, data[d]]
+ndata = {}
+data.keys.sort.collect { |d|
+    ndata[d.year.to_s + "/" + d.month.to_s] = data[d]
+}
+
+ndata["2008/12"]["news"] = "EU leaders agree on a 200bn euro stimulus plan to help boost European growth following the global financial crisis."
+ndata["2009/4"]["news"] = "EU orders France, Spain, Ireland and Greece to reduce their budget deficits."
+ndata["2009/12"]["news"] = "Greece is burdened with debt amounting to 113% of GDP &mdash; nearly double the eurozone limit of 60%. Ratings agencies start to downgrade Greek bank and government debt."
+ndata["2010/1"]["news"] = "An EU report condemns \"severe irregularities\" in Greek accounting procedures."
+ndata["2010/2"]["news"] = "Greece unveils a series of austerity measures aimed at curbing the deficit."
+ndata["2010/3"]["news"] = "The Eurozone and IMF agree a safety net of 22bn euro to help Greece."
+ndata["2010/4"]["news"] = "The Eurozone countries agree to provide up to 30bn euro in emergency loans."
+ndata["2010/5"]["news"] = "The Eurozone members and the IMF agree a 110bn euro bailout package to rescue Greece."
+ndata["2010/11"]["news"] = "The EU and IMF agree to a bailout package to the Irish Republic totalling 85bn euro."
+ndata["2011/2"]["news"] = "Eurozone finance ministers set up a permanent bailout fund, called the European Stability Mechanism, worth about 500bn euro."
+ndata["2011/4"]["news"] = "Portugal admits it cannot deal with its finances itself and asks the EU for help."
+ndata["2011/5"]["news"] = "The Eurozone and the IMF approve a 78bn euro bailout for Portugal."
+ndata["2011/7"]["news"] = "The Eurozone agrees a comprehensive 109bn euro package designed to resolve the Greek crisis and prevent contagion among other European economies."
+ndata["2011/8"]["news"] = "The European Central Bank says it will buy Italian and Spanish government bonds to try to bring down their borrowing costs."
+
+jsondata = ndata.keys.sort.collect { |d|
+    [d, ndata[d]]
     #puts d
 }
 
