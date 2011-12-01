@@ -126,6 +126,15 @@ path.med {
     border-bottom: 0;
     height: .8em;
 }
+.ui-slider-tick-main {
+    position: absolute;
+    border-left-width: 2px;
+    border-left-style: solid;
+    border-right: 0;
+    border-top: 0;
+    border-bottom: 0;
+    height: .8em;
+}
 
 .ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
 .ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative;  }
@@ -565,7 +574,10 @@ path.med {
             });
             d3.select("#slider").selectAll("span").data(json).enter()
                 .append("span")
-                .attr("class", "ui-slider-tick")
+                .attr("class", function(d, i) {
+                    return i % 12 == 0 ? "ui-slider-tick-main" :
+                                         "ui-slider-tick";
+                })
                 .style("left", function(d, i) {
                     return (i*100/(json.length-1)) + "%";
                 });
