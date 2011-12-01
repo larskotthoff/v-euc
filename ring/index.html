@@ -166,11 +166,13 @@ path.med {
         <div id="q" class="q" style="position: fixed; right: 10px; top: 10px;">
             ?
         </div>
-        <div style="position: relative; height: 70%;">
+        <div style="width: 30%; position: relative; height: 70%;">
             <table style="padding: 10px; border-spacing: 10px;" id="cselector">
             </table>
         </div>
-        <div id="timelabel" class="timelabel" style="position: relative;">
+        <div id="timelabel" class="timelabel" style="width: 30%; position: relative;">
+        </div>
+        <div id="news" style="font-size: larger; top: 20px; width: 30%; position: relative;">
         </div>
         <div style="position: fixed; left: 30%; top: 10px; bottom: 50px;">
             <div id="graph"></div>
@@ -182,7 +184,7 @@ path.med {
             </div>
         </div>
         <div style="position: fixed; bottom: 10px; left: 10px;">
-            Data from ECB, EuroStat, IMF, OECD, World Bank
+            Data from ECB, EuroStat, IMF, OECD, World Bank, BBC
         </div>
         <div style="position: fixed; bottom: 10px; right: 10px;">
             Lars Kotthoff 2011
@@ -345,10 +347,20 @@ path.med {
 
             function update(idx, delay) {
                 d3.select("#timelabel").html(fd(json[idx][0]));
-                var dat = d3.entries(json[idx][1]).sort(function(a, b) {
-                    return measures.indexOf(a.key) -
-                            measures.indexOf(b.key);
-                });
+                if(delay == 0) {
+                    if(json[idx][1].news) {
+                        $("#news").html(json[idx][1].news);
+                    } else {
+                        $("#news").empty();
+                    }
+                }
+                var ents = d3.entries(json[idx][1]),
+                    dat = $.map(ents, function(x) {
+                        if(x.key != "news") { return x; }
+                    }).sort(function(a, b) {
+                        return measures.indexOf(a.key) -
+                                measures.indexOf(b.key);
+                    });
                 $.each(["max", "min", "med"], function(j, m) {
                     ctr.selectAll("path." + m)
                         .data([dat.concat(dat[0])])

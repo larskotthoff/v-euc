@@ -336,7 +336,7 @@ ndata["2011/5"]["news"] = "The Eurozone and the IMF approve a 78bn euro bailout 
 ndata["2011/7"]["news"] = "The Eurozone agrees a comprehensive 109bn euro package designed to resolve the Greek crisis and prevent contagion among other European economies."
 ndata["2011/8"]["news"] = "The European Central Bank says it will buy Italian and Spanish government bonds to try to bring down their borrowing costs."
 
-jsondata = ndata.keys.sort.collect { |d|
+jsondata = ndata.keys.sort { |a,b| Date.strptime(a, "%Y/%m") <=> Date.strptime(b, "%Y/%m") }.collect { |d|
     [d, ndata[d]]
     #puts d
 }
