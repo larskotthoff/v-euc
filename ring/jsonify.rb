@@ -16,10 +16,10 @@ def med(vs)
     end
 end
 
-def aggbyfield(field, lines)
+def aggbyfield(field, lines, splitter=/\t/)
     h = {}
     lines.each { |l|
-        d = l.split(/,/)[field]
+        d = l.split(splitter)[field]
         if h.has_key?(d)
             h[d] << l
         else
@@ -61,8 +61,8 @@ debth.each { |d,lines|
         date = Date.strptime(datestr, "%m/%Y")
         debt[date] = {} unless debt.has_key?(date)
         lines.each { |l|
-            country = EU12.find { |c| l.split(/,/)[1] =~ Regexp.new(c) }
-            debt[date][repl[country]] = cv(l.split(/,/)[5])
+            country = EU12.find { |c| l.split(/\t/)[1] =~ Regexp.new(c) }
+            debt[date][repl[country]] = cv(l.split(/\t/)[5])
         }
     }
 }
@@ -99,8 +99,8 @@ gdpgh.each { |d,lines|
         date = Date.strptime(datestr, "%m/%Y")
         gdpgrowth[date] = {} unless gdpgrowth.has_key?(date)
         lines.each { |l|
-            country = EU12.find { |c| l.split(/,/)[1] =~ Regexp.new(c) }
-            gdpgrowth[date][repl[country]] = cv(l.split(/,/)[5])
+            country = EU12.find { |c| l.split(/\t/)[1] =~ Regexp.new(c) }
+            gdpgrowth[date][repl[country]] = cv(l.split(/\t/)[5])
         }
     }
 }
@@ -156,7 +156,7 @@ unemploymentcsv.each { |l|
 investment = {}
 
 investmentcsv = IO.readlines("gdp-investment-oecd.csv")[1..-1]
-investmenth = aggbyfield(-3, investmentcsv)
+investmenth = aggbyfield(-3, investmentcsv, /,/)
 investmenth.each { |d,lines|
     y = d[-5..-2].to_i
     (0..2).each { |md|
@@ -182,6 +182,21 @@ investmenth.each { |d,lines|
                                         end
         }
     }
+}
+inv2011 = {"Au" => 22.742, "Be" => 19.806, "Fi" => 19.944, "Fr" => 21.213, "Ge" => 19.106, "Gr" => 12.382, "Ir" => 9.985, "It" => 19.942, "Lu" => 17.686, "Ne" => 19.393, "Po" => 17.587, "Sp" => 21.842}
+(1..12).each { |m|
+    datestr = m.to_s + "/2011"
+    date = Date.strptime(datestr, "%m/%Y")
+    if investment.has_key?(date)
+        inv2011.each { |k,v|
+            investment[date][k] = v unless investment[date].has_key?(k) and not investment[date][k].nil?
+        }
+    else
+        investment[date] = {}
+        inv2011.each { |k,v|
+            investment[date][k] = v
+        }
+    end
 }
 
 edebt = {}
