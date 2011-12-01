@@ -184,7 +184,12 @@ path.med {
             </div>
         </div>
         <div style="position: fixed; bottom: 10px; left: 10px;">
-            Data from ECB, EuroStat, IMF, OECD, World Bank, BBC
+            Data from the <a href="http://www.ecb.int/">ECB</a>,
+            <a href="http://epp.eurostat.ec.europa.eu/">EuroStat</a>,
+            the <a href="http://www.imf.org/">IMF</a>,
+            the <a href="http://www.oecd.org/">OECD</a>,
+            the <a href="http://www.worldbank.org/">World Bank</a> and
+            the <a href="http://news.bbc.co.uk/">BBC</a>.
         </div>
         <div style="position: fixed; bottom: 10px; right: 10px;">
             Lars Kotthoff 2011
@@ -204,6 +209,8 @@ path.med {
             Select countries through the checkboxes on the left to show them in
             the graph. Move the slider below the graph to see the data for a
             specific month or click the "Play" icon to start an animation.
+            <br/>
+            Important news/developments are shown for some months.
             </p>
 
             <p>
@@ -252,6 +259,16 @@ path.med {
         </div>
         <script type="text/javascript">
         (function () {
+        function showInfo() {
+            $("#info").dialog('open');
+        }
+        $("#info").dialog({
+            autoOpen: false,
+            closeText: "x",
+            width: 600
+        });
+        d3.select("#q").on("click", showInfo);
+
         var margin = 30,
             aduration = 750,
             playing = false,
@@ -572,16 +589,6 @@ path.med {
                 }
             }
             d3.select("#pcontrol").on("click", togglePlay);
-
-            function showInfo() {
-                $("#info").dialog('open');
-            }
-            $("#info").dialog({
-                autoOpen: false,
-                closeText: "x",
-                width: 600
-            });
-            d3.select("#q").on("click", showInfo);
         });
         })();
         </script>
