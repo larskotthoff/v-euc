@@ -375,11 +375,10 @@ path.med {
 
             function update(idx, delay) {
                 d3.select("#timelabel").html(fd(json[idx][0]));
+                $("#news").empty();
                 if(delay == 0) {
                     if(json[idx][1].news) {
                         $("#news").html(json[idx][1].news);
-                    } else {
-                        $("#news").empty();
                     }
                 }
                 var ents = d3.entries(json[idx][1]),
