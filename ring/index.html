@@ -483,6 +483,19 @@ path.med {
             });
             */
 
+            ctr.append("svg:text")
+                .style("font-weight", "bold")
+                .style("font-size", "larger")
+                .attr("transform",
+                    "translate(" + 0.35*width + "," + -0.4*height + ")")
+                .text("↑ boom");
+            ctr.append("svg:text")
+                .style("font-weight", "bold")
+                .style("font-size", "larger")
+                .attr("transform",
+                    "translate(" + 0.35*width + "," + 0.35*height + ")")
+                .text("↓ bust");
+
             $.each(axes, function(i, a) {
                 $.each([true, false], function(j, v) {
                     ctr.append("svg:g")
