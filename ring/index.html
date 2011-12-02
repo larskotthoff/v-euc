@@ -443,14 +443,19 @@ path.me {
                     ctr.selectAll("path." + m)
                         .data([dat])
                         .transition().duration(delay)
-                        .attr("d", line(function(d) { return d[m]; }));
+                        .attr("d", function(e) {
+                            return line(function(d) { return d[m]; })(e) + "Z";
+                        });
                 });
                 $.each(countries, function(j, c) {
                     var cls = c.substr(0, 2);
                     ctr.selectAll("path." + cls)
                         .data([dat])
                         .transition().duration(delay)
-                        .attr("d", line(function(d) { return d[cls]; }));
+                        .attr("d", function(e) {
+                            return line(function(d) { return d[cls]; })(e) +
+                                "Z";
+                        });
                 });
                 $.each(["ma", "mi"], function(j, m) {
                     ctr.selectAll("g." + m)
@@ -484,7 +489,9 @@ path.me {
                     .enter()
                     .append("svg:path")
                     .attr("class", m)
-                    .attr("d", line(function(d) { return d[m]; }));
+                    .attr("d", function(e) {
+                        return line(function(d) { return d[m]; })(e) + "Z";
+                    });
             });
             $.each(countries, function(j, c) {
                 var cls = c.substr(0, 2);
@@ -493,7 +500,9 @@ path.me {
                     .enter()
                     .append("svg:path")
                     .attr("class", cls + " hidden")
-                    .attr("d", line(function(d) { return d[cls]; }));
+                    .attr("d", function(e) {
+                        return line(function(d) { return d[cls]; })(e) + "Z";
+                    });
             });
 
             /*
