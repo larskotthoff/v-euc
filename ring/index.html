@@ -21,7 +21,7 @@ h1 {
 }
 .timelabel {
     font-weight: normal;
-    font-size: 4em;
+    font-size: 3em;
     margin: 0 0 0;
     color: #444;
 }
@@ -275,19 +275,19 @@ path.me {
 
             <p>
             The indicators are as follows.
-            <ul>
-                <li><strong>GDP growth.</strong> Increase in total economic
-                output.</li>
-                <li><strong>Surplus.</strong> Government surplus or
-                deficit.</li>
-                <li><strong>Interest.</strong> Interest rate payable on
-                government 10 year bonds.</li>
-                <li><strong>Debt.</strong> Total government debt.</li>
-                <li><strong>Unemployment.</strong> Overall unemployment
-                rate.</li>
-                <li><strong>Inflation.</strong> Change in price levels.</li>
-                <li><strong>Investments.</strong> Investments as measured by <a href="http://en.wikipedia.org/wiki/Gross_fixed_capital_formation">Gross fixed capital formation</a>.
-            </ul>
+            <dl>
+                <dt>GDP growth.</dt><dd>Increase in total economic
+                output.</dd>
+                <dt>Surplus.</dt><dd>Government surplus or
+                deficit.</dd>
+                <dt>Interest.</dt><dd>Interest rate payable on
+                government 10 year bonds.</dd>
+                <dt>Debt.</dt><dd>Total government debt.</dd>
+                <dt>Unemployment.</dt><dd>Overall unemployment
+                rate.</dd>
+                <dt>Inflation.</dt><dd>Change in price levels.</dd>
+                <dt>Investments.</dt><dd>Investments as measured by <a href="http://en.wikipedia.org/wiki/Gross_fixed_capital_formation">Gross fixed capital formation</a>.</dd>
+            </dl>
             </p>
 
             <p>
@@ -541,14 +541,12 @@ path.me {
             */
 
             ctr.append("svg:text")
-                .style("font-weight", "bold")
-                .style("font-size", "larger")
+                .style("font-size", "180%")
                 .attr("transform",
                     "translate(" + 0.35*width + "," + -0.4*height + ")")
                 .text("↑ boom");
             ctr.append("svg:text")
-                .style("font-weight", "bold")
-                .style("font-size", "larger")
+                .style("font-size", "180%")
                 .attr("transform",
                     "translate(" + 0.35*width + "," + 0.35*height + ")")
                 .text("↓ bust");
