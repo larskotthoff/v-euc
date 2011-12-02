@@ -11,11 +11,13 @@
         <style type="text/css">
 body {
     font: 12px Verdana, Palatino, Helvetica, sans;
+    background: #fdfdfd;
 }
 h1 {
     font-weight: normal;
     font-size: 4em;
     margin: 0 0 0;
+    color: #444;
 }
 .timelabel {
     font-weight: normal;
@@ -24,7 +26,7 @@ h1 {
     color: #444;
 }
 .back {
-    stroke: #fff;
+    stroke: #fdfdfd;
     stroke-width: 2.5;
 }
 
@@ -41,7 +43,7 @@ path.max {
     stroke: none;
 }
 path.min {
-    fill: #fff;
+    fill: #fdfdfd;
     stroke: none;
 }
 path.med {
@@ -52,39 +54,63 @@ path.med {
 
 .Au {
     stroke: #ff7f0e;
+    color: #ff7f0e;
+    font-weight: bold;
 }
 .Be {
     stroke: #ffbb78;
+    color: #ffbb78;
+    font-weight: bold;
 }
 .Fi {
     stroke: #2ca02c;
+    color: #2ca02c;
+    font-weight: bold;
 }
 .Fr {
     stroke: #98df8a;
+    color: #98df8a;
+    font-weight: bold;
 }
 .Ge {
     stroke: #d62728;
+    color: #d62728;
+    font-weight: bold;
 }
 .Gr {
     stroke: #ff9896;
+    color: #ff9896;
+    font-weight: bold;
 }
 .Ir {
     stroke: #9467bd;
+    color: #9467bd;
+    font-weight: bold;
 }
 .It {
     stroke: #8c564b;
+    color: #8c564b;
+    font-weight: bold;
 }
 .Lu {
     stroke: #7f7f7f;
+    color: #7f7f7f;
+    font-weight: bold;
 }
 .Ne {
     stroke: #c7c7c7;
+    color: #c7c7c7;
+    font-weight: bold;
 }
 .Po {
     stroke: #bcbd22;
+    color: #bcbd22;
+    font-weight: bold;
 }
 .Sp {
     stroke: #dbdb8d;
+    color: #dbdb8d;
+    font-weight: bold;
 }
 .hidden {
     stroke: none;
@@ -99,7 +125,7 @@ path.med {
 }
 
 .ui-widget { font: 12px Verdana, Palatino, Helvetica, sans; }
-.ui-widget-header { border: 1px solid #444; background: #666; color: #ffffff; font-weight: bold; }
+.ui-widget-header { border: 1px solid #444; background: #666; color: #fdfdfd; font-weight: bold; }
 
 .ui-widget-content { border: 1px solid #444; background: #aaa; color: #333; }
 .ui-widget-content.ui-slider { border: none; border-bottom: 1px solid #444; background: none; color: #000; }
@@ -320,18 +346,23 @@ path.med {
             tr.append("td").append("input")
                 .attr("type", "checkbox")
                 .on("click", function() { toggleCLine(cid); });
-            tr.append("td").style("font-size", "larger").html(c);
+            tr.append("td").attr("class", "label-" + cid)
+                .style("font-size", "larger").html(c);
+            /*
             tr.append("td").append("svg:svg")
                 .attr("width", 20).attr("height", 5)
                 .append("svg:path")
                 .attr("d", "M0,2 20,2")
                 .attr("class", cid + " label hidden");
+            */
         });
 
         function toggleCLine(cid) {
-            var p = d3.selectAll("." + cid),
-                c = p.classed("hidden");
-            p.classed("hidden", c ^ true);
+            var p = d3.selectAll("path." + cid),
+                c = p.classed("hidden"),
+                n = c ^ true;
+            p.classed("hidden", n);
+            d3.select("td.label-" + cid).classed(cid, !n);
         }
 
         function vf(f) {
