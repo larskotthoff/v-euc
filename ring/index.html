@@ -349,7 +349,7 @@ path.med {
                 tr = d3.select("#cselector").append("tr");
             tr.append("td").append("input")
                 .attr("type", "checkbox")
-                .on("click", function() { toggleCLine(cid); });
+                .on("click", function() { toggleLegend(cid); });
             tr.append("td").attr("class", "label-" + cid)
                 .style("font-size", "larger").html(c);
             /*
@@ -361,7 +361,7 @@ path.med {
             */
         });
 
-        function toggleCLine(cid) {
+        function toggleLegend(cid) {
             var p = d3.selectAll("path." + cid),
                 c = p.classed("hidden"),
                 n = c ^ true;
@@ -409,6 +409,8 @@ path.med {
 
             function line(f) {
                 return d3.svg.line()
+                    .interpolate("cardinal-closed")
+                    .tension(0.85)
                     .x(function(e, i) {
                         var l = scales[i%measures.length](f(e.value));
                         return Math.sin(angle(i)) * l;
@@ -436,14 +438,14 @@ path.med {
                     });
                 $.each(["max", "min", "med"], function(j, m) {
                     ctr.selectAll("path." + m)
-                        .data([dat.concat(dat[0])])
+                        .data([dat])
                         .transition().duration(delay)
                         .attr("d", line(function(d) { return d[m]; }));
                 });
                 $.each(countries, function(j, c) {
                     var cls = c.substr(0, 2);
                     ctr.selectAll("path." + cls)
-                        .data([dat.concat(dat[0])])
+                        .data([dat])
                         .transition().duration(delay)
                         .attr("d", line(function(d) { return d[cls]; }));
                 });
@@ -475,7 +477,7 @@ path.med {
             });
             $.each(["max", "min", "med"], function(j, m) {
                 ctr.selectAll("path." + m)
-                    .data([dat.concat(dat[0])])
+                    .data([dat])
                     .enter()
                     .append("svg:path")
                     .attr("class", m)
@@ -484,7 +486,7 @@ path.med {
             $.each(countries, function(j, c) {
                 var cls = c.substr(0, 2);
                 ctr.selectAll("path." + cls)
-                    .data([dat.concat(dat[0])])
+                    .data([dat])
                     .enter()
                     .append("svg:path")
                     .attr("class", cls + " hidden")
