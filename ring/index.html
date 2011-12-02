@@ -38,15 +38,15 @@ path {
 path.label {
     stroke-width: 5;
 }
-path.max {
+path.ma {
     fill: #88f;
     stroke: none;
 }
-path.min {
+path.mi {
     fill: #fdfdfd;
     stroke: none;
 }
-path.med {
+path.me {
     fill: none;
     stroke: #00f;
     stroke-linecap: round;
@@ -329,8 +329,7 @@ path.med {
             countries = ["Austria", "Belgium", "Finland", "France", "Germany",
                 "Greece", "Ireland", "Italy", "Luxembourg", "Netherlands",
                 "Portugal", "Spain"],
-            measures = ["debt", "int", "def", "gdpd", "inv", "inf",
-                "unemp"]
+            measures = ["d", "int", "s", "g", "inv", "inf", "u"]
             labels = ["Debt [%GDP]",
                 "Interest [%]", "Surplus [%GDP]", "GDP growth [%]",
                 "Investments [%GDP]", "Inflation [%]", "Unemployment [%]"]
@@ -384,12 +383,12 @@ path.med {
         d3.json("eu.json", function(json) {
             var minses = $.map(measures, function(m) {
                     return d3.min($.map(json, function(d) {
-                        return d[1][m].min;
+                        return d[1][m].mi;
                     }));
                 }),
                 maxes = $.map(measures, function(m) {
                     return d3.max($.map(json, function(d) {
-                        return d[1][m].max;
+                        return d[1][m].ma;
                     }));
                 }),
                 scales = $.map(measures, function(m, i) {
@@ -436,7 +435,7 @@ path.med {
                         return measures.indexOf(a.key) -
                                 measures.indexOf(b.key);
                     });
-                $.each(["max", "min", "med"], function(j, m) {
+                $.each(["ma", "mi", "me"], function(j, m) {
                     ctr.selectAll("path." + m)
                         .data([dat])
                         .transition().duration(delay)
@@ -449,7 +448,7 @@ path.med {
                         .transition().duration(delay)
                         .attr("d", line(function(d) { return d[cls]; }));
                 });
-                $.each(["max", "min"], function(j, m) {
+                $.each(["ma", "mi"], function(j, m) {
                     ctr.selectAll("g." + m)
                         .data(dat)
                         .transition().duration(delay)
@@ -475,7 +474,7 @@ path.med {
             var dat = d3.entries(json[0][1]).sort(function(a, b) {
                 return measures.indexOf(a.key) - measures.indexOf(b.key);
             });
-            $.each(["max", "min", "med"], function(j, m) {
+            $.each(["ma", "mi", "me"], function(j, m) {
                 ctr.selectAll("path." + m)
                     .data([dat])
                     .enter()

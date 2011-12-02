@@ -257,52 +257,52 @@ interest.keys.sort.each { |k|
     tmp = {}
     next if not debt.has_key?(k) or debt[k].values.any? { |x| x.nil? }
     vs = debt[k].values.sort
-    tmp["debt"] = debt[k]
-    tmp["debt"]["min"] = vs.min
-    tmp["debt"]["max"] = vs.max
-    tmp["debt"]["med"] = med(vs)
+    tmp["d"] = debt[k]
+    tmp["d"]["mi"] = vs.min
+    tmp["d"]["ma"] = vs.max
+    tmp["d"]["me"] = med(vs)
 
     next if not deficit.has_key?(k) or deficit[k].values.any? { |x| x.nil? }
     vs = deficit[k].values.sort
-    tmp["def"] = deficit[k]
-    tmp["def"]["min"] = vs.min
-    tmp["def"]["max"] = vs.max
-    tmp["def"]["med"] = med(vs)
+    tmp["s"] = deficit[k]
+    tmp["s"]["mi"] = vs.min
+    tmp["s"]["ma"] = vs.max
+    tmp["s"]["me"] = med(vs)
 
     next if not gdpgrowth.has_key?(k) or gdpgrowth[k].values.any? { |x| x.nil? }
     vs = gdpgrowth[k].values.sort
-    tmp["gdpd"] = gdpgrowth[k]
-    tmp["gdpd"]["min"] = vs.min
-    tmp["gdpd"]["max"] = vs.max
-    tmp["gdpd"]["med"] = med(vs)
+    tmp["g"] = gdpgrowth[k]
+    tmp["g"]["mi"] = vs.min
+    tmp["g"]["ma"] = vs.max
+    tmp["g"]["me"] = med(vs)
 
     next if not inflation.has_key?(k) or inflation[k].values.any? { |x| x.nil? }
     vs = inflation[k].values.sort
     tmp["inf"] = inflation[k]
-    tmp["inf"]["min"] = vs.min
-    tmp["inf"]["max"] = vs.max
-    tmp["inf"]["med"] = med(vs)
+    tmp["inf"]["mi"] = vs.min
+    tmp["inf"]["ma"] = vs.max
+    tmp["inf"]["me"] = med(vs)
 
     next if not interest.has_key?(k) or interest[k].values.any? { |x| x.nil? }
     vs = interest[k].values.sort
     tmp["int"] = interest[k]
-    tmp["int"]["min"] = vs.min
-    tmp["int"]["max"] = vs.max
-    tmp["int"]["med"] = med(vs)
+    tmp["int"]["mi"] = vs.min
+    tmp["int"]["ma"] = vs.max
+    tmp["int"]["me"] = med(vs)
 
     next if not unemployment.has_key?(k) or unemployment[k].values.any? { |x| x.nil? }
     vs = unemployment[k].values.sort
-    tmp["unemp"] = unemployment[k]
-    tmp["unemp"]["min"] = vs.min
-    tmp["unemp"]["max"] = vs.max
-    tmp["unemp"]["med"] = med(vs)
+    tmp["u"] = unemployment[k]
+    tmp["u"]["mi"] = vs.min
+    tmp["u"]["ma"] = vs.max
+    tmp["u"]["me"] = med(vs)
 
     next if not investment.has_key?(k) or investment[k].values.any? { |x| x.nil? }
     vs = investment[k].values.sort
     tmp["inv"] = investment[k]
-    tmp["inv"]["min"] = vs.min
-    tmp["inv"]["max"] = vs.max
-    tmp["inv"]["med"] = med(vs)
+    tmp["inv"]["mi"] = vs.min
+    tmp["inv"]["ma"] = vs.max
+    tmp["inv"]["me"] = med(vs)
 
     #next if not edebt.has_key?(k) or edebt[k].values.any? { |x| x.nil? }
     #ihashtmp = edebt[k].dup
