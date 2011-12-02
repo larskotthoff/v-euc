@@ -127,13 +127,17 @@ path.med {
 .ui-widget { font: 12px Verdana, Palatino, Helvetica, sans; }
 .ui-widget-header { border: 1px solid #444; background: #666; color: #fdfdfd; font-weight: bold; }
 
-.ui-widget-content { border: 1px solid #444; background: #aaa; color: #333; }
+.ui-widget-content { border: 1px solid #444; background: #fdfdfd; }
 .ui-widget-content.ui-slider { border: none; border-bottom: 1px solid #444; background: none; color: #000; }
 .ui-widget-content a { color: #333; }
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #444; background: #444; font-weight: bold; color: #333; }
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #444; background: #ccc; font-weight: bold; color: #333; }
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid #444; background: #ccc; font-weight: bold; color: #333; }
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #444; background: #fdfdfd; font-weight: bold; color: #333; }
+.ui-slider-handle.ui-state-default { border: 1px solid #444; background: #000; font-weight: bold; color: #333; }
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #444; background: #fdfdfd; font-weight: bold; color: #333; }
+.ui-slider-handle.ui-state-hover { border: 1px solid #444; background: #666; font-weight: bold; color: #333; }
+.ui-slider-handle.ui-state-focus { border: 1px solid #444; background: #666; font-weight: bold; color: #333; }
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid #444; background: #fdfdfd; font-weight: bold; color: #333; }
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: #333; text-decoration: none; }
+.ui-slider-handle.ui-state-active { border: 1px solid #444; background: #666; font-weight: bold; color: #333; }
 
 .ui-slider { position: relative; text-align: left; }
 .ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: .4em; height: 1.6em; cursor: default; }
@@ -202,8 +206,8 @@ path.med {
 .ui-widget-content .ui-icon {background-image: url(ui-icons_222222_256x240.png); }
 .ui-widget-header .ui-icon {background-image: url(ui-icons_ffffff_256x240.png); }
 .ui-state-default .ui-icon { background-image: url(ui-icons_ffffff_256x240.png); }
-.ui-state-hover .ui-icon, .ui-state-focus .ui-icon {background-image: url(ui-icons_ffffff_256x240.png); }
-.ui-state-active .ui-icon {background-image: url(ui-icons_ffffff_256x240.png); }
+.ui-state-hover .ui-icon, .ui-state-focus .ui-icon {background-image: url(ui-icons_222222_256x240.png); }
+.ui-state-active .ui-icon {background-image: url(ui-icons_222222_256x240.png); }
 .ui-state-highlight .ui-icon {background-image: url(ui-icons_222222_256x240.png); }
 .ui-icon-closethick { background-position: -96px -128px; }
 .ui-icon-grip-diagonal-se { background-position: -80px -224px; }
@@ -312,7 +316,7 @@ path.med {
         }
         $("#info").dialog({
             autoOpen: false,
-            closeText: "x",
+            closeText: "",
             width: 600
         });
         d3.select("#q").on("click", showInfo);
