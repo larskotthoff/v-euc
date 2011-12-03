@@ -64,14 +64,12 @@ path {
 
         d3.json("eu.json", function(json) {
             var minses = $.map(measures, function(m) {
-                    return d3.min($.map(json, function(d) {
-                        return d[1][m].mi;
-                    }));
+                    return d3.min([json[0][1][m].mi,
+                        json[json.length-1][1][m].mi]);
                 }),
                 maxes = $.map(measures, function(m) {
-                    return d3.max($.map(json, function(d) {
-                        return d[1][m].ma;
-                    }));
+                    return d3.max([json[0][1][m].ma,
+                        json[json.length-1][1][m].ma]);
                 }),
                 scales = $.map(measures, function(m, i) {
                     return d3.scale.linear()
