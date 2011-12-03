@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Eurozone crisis</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <script type="text/javascript" src="../../d3.min.js"></script>
+        <script type="text/javascript" src="../../d3.layout.min.js"></script>
+        <script type="text/javascript" src="../../d3.time.min.js"></script>
+        <script type="text/javascript" src="../../jquery-1.6.2.min.js"></script>
+        <style type="text/css">
+body {
+    font: 12px Verdana, Palatino, Helvetica, sans;
+    background: #fff;
+}
+.timelabel {
+    font-weight: normal;
+    font-size: 3em;
+    margin: 0 0 0;
+    color: #444;
+}
+.back {
+    stroke: #fff;
+    stroke-width: 2.5;
+}
+
+path {
+    stroke: none;
+}
+        </style>
+    </head>
+
+    <body>
+        <div id="graph"></div>
+        <script type="text/javascript">
+        (function () {
+        var margin = 30,
+            idformat = d3.time.format("%Y/%m"),
+            odformat = d3.time.format("%B %Y"),
+            measures = ["d", "int", "s", "g", "inv", "inf", "u"]
+            labels = ["Debt [%GDP]",
+                "Interest [%]", "Surplus [%GDP]", "GDP growth [%]",
+                "Investments [%GDP]", "Inflation [%]", "Unemployment [%]"]
+            width = window.innerWidth,
+            height = window.innerHeight,
+            r = (d3.min([width, height]) / 2) - 1.5 * margin,
+            svg = d3.select("#graph")
+                .append("svg:svg")
+                .attr("height", height)
+                .attr("width", width),
+            ctr = svg.append("svg:g").attr("transform", "translate(" + width/2 +
+                "," + height/2 + ")");
+
+        function vf(f) {
+            if(f >= 100 || f <= -100) {
+                return Math.round(f);
+            } else {
+                return f.toFixed(1);
+            }
+        }
+
+        function fd(ds) {
+            return odformat(idformat.parse(ds));
+        }
+
+        d3.json("eu.json", function(json) {
+            var minses = $.map(measures, function(m) {
+                    return d3.min($.map(json, function(d) {
+                        return d[1][m].mi;
+                    }));
+                }),
+                maxes = $.map(measures, function(m) {
+                    return d3.max($.map(json, function(d) {
+                        return d[1][m].ma;
+                    }));
+                }),
+                scales = $.map(measures, function(m, i) {
+                    return d3.scale.linear()
+                        .domain([minses[i], maxes[i]])
+                        .range([margin, r]).nice();
+                })
+                axes = $.map(measures, function(m, i) {
+                    return d3.svg.axis().scale(scales[i]).orient("left")
+                        .tickSize(0);
+                });
+
+            function angle(i) {
+                return i * (2 * Math.PI / measures.length) +
+                    Math.PI/measures.length;
+            }
+
+            var area = d3.svg.area.radial()
+                .interpolate("cardinal-closed")
+                .tension(0.85)
+                .innerRadius(function(e, i) {
+                    return scales[i%measures.length](e.value.mi);
+                })
+                .outerRadius(function(e, i) {
+                    return scales[i%measures.length](e.value.ma);
+                })
+                .angle(function(e, i) {
+                    return -angle(i) - Math.PI;
+                });
+
+            $.each([[0, "#88f"], [json.length-1, "#ff7f0e"]],
+                    function(k, o) {
+                var dat = d3.entries(json[o[0]][1]).sort(function(a, b) {
+                    return measures.indexOf(a.key) - measures.indexOf(b.key);
+                });
+                ctr.selectAll("path.f" + k)
+                    .data([dat])
+                    .enter()
+                    .append("svg:path")
+                    .attr("fill", o[1])
+                    .attr("fill-opacity", 0.5)
+                    .attr("class", "f" + k)
+                    .attr("d", area);
+                svg.append("svg:text")
+                    .attr("transform", "translate(50," + (400 + 50*k) + ")")
+                    .attr("font-size", "200%")
+                    .attr("fill", o[1])
+                    .text(fd(json[o[0]][0]));
+            });
+
+            ctr.append("svg:text")
+                .style("font-size", "180%")
+                .attr("transform",
+                    "translate(" + 0.35*width + "," + -0.4*height + ")")
+                .text("↑ boom");
+            ctr.append("svg:text")
+                .style("font-size", "180%")
+                .attr("transform",
+                    "translate(" + 0.35*width + "," + 0.35*height + ")")
+                .text("↓ bust");
+
+            $.each(axes, function(i, a) {
+                $.each([true, false], function(j, v) {
+                    ctr.append("svg:g")
+                        .attr("transform",
+                            "rotate(" + -(angle(i)*180/Math.PI) + ")")
+                        .call(a)
+                        .selectAll("text")
+                        .attr("text-anchor", "middle")
+                        .attr("class", v ? "back" : "")
+                        .attr("transform", function(d) {
+                            var x = d3.select(this).attr("x"),
+                                y = d3.select(this).attr("y");
+                            return "rotate(" + (angle(i)*180/Math.PI) + " " +
+                                    x + " " + y + ")";
+                        });
+                });
+            });
+
+            ctr.selectAll("text.label")
+                .data(labels)
+                .enter()
+                .append("svg:text")
+                .attr("class", "label")
+                .attr("transform", function(d, i) {
+                    var fac = i == 1 || i == 5 ? 1.04 : 1.06,
+                        x = Math.sin(angle(i)) * fac*r,
+                        y = Math.cos(angle(i)) * fac*r;
+                    return "translate(" + x + "," + y + ")";
+                })
+                .attr("text-anchor", function(d, i) {
+                    if(angle(i) % Math.PI == 0) {
+                        return "middle";
+                    } else if(angle(i) < Math.PI) {
+                        return "start";
+                    } else {
+                        return "end";
+                    }
+                })
+                .text(function(d) { return d; });
+        });
+        })();
+        </script>
+    </body>
+</html>
