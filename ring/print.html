@@ -10,21 +10,6 @@
         <style type="text/css">
 body {
     font: 12px Verdana, Palatino, Helvetica, sans;
-    background: #fff;
-}
-.timelabel {
-    font-weight: normal;
-    font-size: 3em;
-    margin: 0 0 0;
-    color: #444;
-}
-.back {
-    stroke: #fff;
-    stroke-width: 2.5;
-}
-
-path {
-    stroke: none;
 }
         </style>
     </head>
@@ -138,7 +123,8 @@ path {
                         .call(a)
                         .selectAll("text")
                         .attr("text-anchor", "middle")
-                        .attr("class", v ? "back" : "")
+                        .attr("stroke", v ? "#fff" : "#000")
+                        .attr("stroke-width", v ? 2.5 : 0.1)
                         .attr("transform", function(d) {
                             var x = d3.select(this).attr("x"),
                                 y = d3.select(this).attr("y");
