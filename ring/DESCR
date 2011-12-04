@@ -1,0 +1,30 @@
+This visualisation tries to show the main factors that contribute to the
+Eurozone crisis. Apart from showing how the situation worsened over time, it
+also shows how the disparity within the Eurozone increased.
+
+I selected the indicators according to what I, being no expert, considered to
+affect the crisis or show its effects. There are indicators that could have been
+added but were not because they did not demonstrate the effects of the crisis
+(such as external debt). There are also indicators that I would like to have
+added, but was unable to obtain sufficient data for (such as private debt).
+
+I found the difference between January 2006 and October 2011 quite striking and
+to convey the crisis quite well -- apart from higher debt, interest rates, etc,
+the ring is much wider, with some countries not much worse off but others
+considerably so. Inflation on the other hand, the only measured that is
+controlled centrally by the ECB to a large extent, does not show this wide gap,
+suggesting that some sort of increased central governance could improve the
+situation.
+
+In my opinion, the unique point about this visualisation is that it shows a
+large amount of data in a way that does not require the reader to understand it
+in depth to understand the message. Down is bad, the ring moved down over time
+and became wider, demonstrating a larger disparity. On the other hand, the
+visualisation has enough depth to provide the interested reader with more
+information. Each individual indicator can be studied as well as its change over
+time.
+
+The online version should work with any modern browser, but the "halo" effect
+used to make the numbers on the axes more readable only seems to display
+properly in Chromium/Chrome. I used d3.js for the graphics and JQuery UI for
+some of the interface components.
