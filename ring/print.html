@@ -103,18 +103,36 @@ body {
                     .attr("fill", o[1])
                     .text(fd(json[o[0]][0]));
             });
+            $.each([[0, "#88f"], [json.length-1, "#ff7f0e"]],
+                    function(k, o) {
+                var dat = d3.entries(json[o[0]][1]).sort(function(a, b) {
+                    return measures.indexOf(a.key) - measures.indexOf(b.key);
+                });
+                 $.each(["ma", "mi"], function(j, m) {
+                    var sel = ctr.selectAll("g." + m + k)
+                        .data(dat)
+                        .enter()
+                        .append("svg:g")
+                        .attr("class", m + k)
+                        .attr("transform", function(d, i) {
+                            var l = scales[i](d.value[m]) +
+                                    (j == 0 ? margin : -margin) / 3,
+                                x = Math.sin(angle(i)) * l,
+                                y = Math.cos(angle(i)) * l;
+                            return "translate(" + x + "," + y + ")";
+                        });
+                    sel.append("svg:text")
+                        .attr("stroke", "#fff")
+                        .attr("stroke-width", 2.5)
+                        .attr("text-anchor", "middle")
+                        .text(function(d) { return vf(d.value[m]); });
+                    sel.append("svg:text")
+                        .attr("text-anchor", "middle")
+                        .text(function(d) { return vf(d.value[m]); });
+                });
+            });
 
-            ctr.append("svg:text")
-                .style("font-size", "180%")
-                .attr("transform",
-                    "translate(" + 0.35*width + "," + -0.4*height + ")")
-                .text("↑ boom");
-            ctr.append("svg:text")
-                .style("font-size", "180%")
-                .attr("transform",
-                    "translate(" + 0.35*width + "," + 0.35*height + ")")
-                .text("↓ bust");
-
+            /*
             $.each(axes, function(i, a) {
                 $.each([true, false], function(j, v) {
                     ctr.append("svg:g")
@@ -133,6 +151,7 @@ body {
                         });
                 });
             });
+            */
 
             ctr.selectAll("text.label")
                 .data(labels)
