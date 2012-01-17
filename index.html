@@ -47,6 +47,9 @@ path {
     <body>
         <div style="position: fixed; top: 10px; left: 10px">
             <h1>Euro crisis</h1>
+            Width of lines represents interest rates, colour ratings. Hover over
+            line to see country name. The dashed line shows the 3% deficit limit
+            of the Eurozone.
         </div>
         <div id="graph" style="position: fixed; top: 15%;"></div>
         <div style="position: fixed; bottom: 10px; left: 10px">
@@ -55,7 +58,7 @@ path {
             ratings are those of <a href="http://www.fitchratings.com">Fitch</a>.
         </div>
         <div style="position: fixed; bottom: 10px; right: 10px">
-            Lars Kotthoff 2011
+            Lars Kotthoff 2012
         </div>
         <script type="text/javascript">
         (function () {
@@ -65,7 +68,11 @@ path {
             svg = d3.select("#graph")
                 .append("svg:svg")
                 .attr("height", height)
-                .attr("width", width);
+                .attr("width", width),
+            clab = svg.append("svg:text")
+                .classed("title", true)
+                .attr("transform", "translate(" + (width/2) + "," +
+                    (height/5) + ")");
 
         d3.json("debt.json", function(json) {
             var dmax = d3.max($.map(d3.values(json.deficit), function(d) {
@@ -157,7 +164,6 @@ path {
                 .each(grad);
 
             function mkPs(p, aleft, aright, o) {
-                console.log(aleft, aright);
                 var gamma = aleft - aright,
                     d = o / Math.sin(gamma/2),
                     aup = aright + gamma/2,
@@ -204,7 +210,9 @@ path {
                 .attr("fill", function(d) {
                     return "url(#" + d.key.substr(0, 3) + ")";
                 })
-                .attr("d", varLine);
+                .attr("d", varLine)
+                .on("mouseover", function(d) { clab.text(d.key); })
+                .on("mouseout", function(d) { clab.text(""); });
 
             // debug start
             /*
@@ -239,7 +247,63 @@ path {
                 .classed("title", true)
                 .attr("transform", "translate(" + (margin + 5) + ",15)")
                 .attr("text-anchor", "start")
-                .text("deficit [% GDP]");
+                .text("surplus [% GDP]");
+
+            svg.append("svg:text")
+                .classed("title", true)
+                .attr("transform", "translate(" + (5*width/6-10) + ",10)")
+                .attr("text-anchor", "end")
+                .text("interest (long-term) [%]");
+            svg.append("svg:text")
+                .attr("transform", "translate(" + (5*width/6-10) + ",28)")
+                .attr("text-anchor", "end")
+                .text(imin);
+            svg.append("svg:text")
+                .attr("transform", "translate(" + (5*width/6-10) + "," +
+                    (20 + 2*margin) + ")")
+                .attr("text-anchor", "end")
+                .text(imax);
+            svg.append("svg:text")
+                .classed("title", true)
+                .attr("transform", "translate(" + (5*width/6+10+iscale(imax)) +
+                    ",10)")
+                .attr("text-anchor", "start")
+                .text("rating");
+            svg.append("svg:text")
+                .attr("transform", "translate(" + (5*width/6+10+iscale(imax)) +
+                    ",28)")
+                .attr("text-anchor", "start")
+                .style("stroke", crscale(rscale("AAA")))
+                .text("AAA");
+            svg.append("svg:text")
+                .attr("transform", "translate(" + (5*width/6+10+iscale(imax)) +
+                    "," + (20 + 2*margin) + ")")
+                .attr("text-anchor", "start")
+                .attr("stroke", crscale(rscale("CCC")))
+                .text("CCC");
+
+            var legfill = svg.select("defs")
+                .append("svg:linearGradient")
+                .attr("x1", "0%")
+                .attr("x2", "0%")
+                .attr("y1", "0%")
+                .attr("y2", "100%")
+                .attr("id", "legend");
+            legfill.append("svg:stop")
+                    .attr("offset", 0)
+                    .attr("stop-color", crscale(rscale("AAA")));
+            legfill.append("svg:stop")
+                    .attr("offset", 0.5)
+                    .attr("stop-color", crscale(rscale("BBB")));
+            legfill.append("svg:stop")
+                    .attr("offset", 1)
+                    .attr("stop-color", crscale(rscale("CCC")));
+
+            svg.append("svg:path")
+                .attr("transform", "translate(" + (5*width/6) + ",20)")
+                .attr("fill", "url(#legend)")
+                .attr("d", "M0,0 " + iscale(imin) + ",0 " + iscale(imax) +
+                    "," + 2*margin + " " + "0," + 2*margin + "Z");
         });
         })();
         </script>
